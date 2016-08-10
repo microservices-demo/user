@@ -1,9 +1,5 @@
 package: github.com/microservices-demo/user
 import:
-- package: github.com/Sirupsen/logrus
-  version: v0.10.0
-- package: github.com/dgrijalva/jwt-go
-  version: v3.0.0
 - package: github.com/go-kit/kit
   version: v0.2.0
   subpackages:
