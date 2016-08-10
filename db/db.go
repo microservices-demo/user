@@ -13,7 +13,7 @@ import (
 // this is just basic and specific to this microservice
 type Database interface {
 	Init() error
-	Create(users.User) error
+	Create(*users.User) error
 	GetByName(string) (users.User, error)
 	GetByID(string) (users.User, error)
 	GetAttributes(*users.User) error
@@ -55,7 +55,7 @@ func Register(name string, db Database) {
 	DBTypes[name] = db
 }
 
-func Create(u users.User) error {
+func Create(u *users.User) error {
 	return DefaultDb.Create(u)
 }
 

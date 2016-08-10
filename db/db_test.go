@@ -41,7 +41,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestCreate(t *testing.T) {
-	err := Create(users.User{})
+	err := Create(&users.User{})
 	if err != ErrFakeError {
 		t.Error("expected fake db error from create")
 	}
@@ -87,6 +87,6 @@ func (f fake) GetAttributes(u *users.User) error {
 	u.Addresses = append(u.Addresses, TestAddress)
 	return nil
 }
-func (f fake) Create(users.User) error {
+func (f fake) Create(*users.User) error {
 	return ErrFakeError
 }
