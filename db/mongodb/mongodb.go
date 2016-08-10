@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/microservices-demo/user/users"
 
 	"gopkg.in/mgo.v2"
@@ -34,7 +35,7 @@ type Mongo struct {
 }
 
 type MongoUser struct {
-	*users.User
+	users.User `bson:",inline"`
 	ID         bson.ObjectId   `bson:"_id"`
 	AddressIDs []bson.ObjectId `bson:"addresses"`
 	CardIDs    []bson.ObjectId `bson:"cards"`
@@ -43,26 +44,28 @@ type MongoUser struct {
 func New() MongoUser {
 	u := users.New()
 	return MongoUser{
-		User:       &u,
+		User:       u,
 		AddressIDs: make([]bson.ObjectId, 0),
 		CardIDs:    make([]bson.ObjectId, 0),
 	}
 }
 
-func (mu MongoUser) AddUserIDs() {
-	u := users.New()
-	if mu.User == nil {
-		mu.User = &u
-		return
+func (mu *MongoUser) AddUserIDs() {
+	if mu.User.Addresses == nil {
+		mu.User.Addresses = make([]users.Address, 0)
 	}
 	for _, id := range mu.AddressIDs {
 		mu.User.Addresses = append(mu.User.Addresses, users.Address{
-			ID: id.String(),
+			ID: id.Hex(),
 		})
 	}
-	for _, id := range mu.CardIDs {
-		mu.User.Cards = append(mu.User.Cards, users.Card{ID: id.String()})
+	if mu.User.Cards == nil {
+		mu.User.Cards = make([]users.Card, 0)
 	}
+	for _, id := range mu.CardIDs {
+		mu.User.Cards = append(mu.User.Cards, users.Card{ID: id.Hex()})
+	}
+	mu.User.UserID = mu.ID.Hex()
 }
 
 type MongoAddress struct {
@@ -74,7 +77,7 @@ type MongoCard struct {
 	ID bson.ObjectId `bson:"_id"`
 }
 
-func (m Mongo) Init() error {
+func (m *Mongo) Init() error {
 	u := getURL()
 	var err error
 	m.Session, err = mgo.Dial(u.String())
@@ -84,12 +87,12 @@ func (m Mongo) Init() error {
 	return m.EnsureIndexes()
 }
 
-func (m Mongo) Create(u *users.User) error {
+func (m *Mongo) Create(u *users.User) error {
 	s := m.Session.Copy()
 	defer s.Close()
 	id := bson.NewObjectId()
 	mu := New()
-	mu.User = u
+	mu.User = *u
 	mu.ID = id
 	var carderr error
 	var addrerr error
@@ -108,10 +111,11 @@ func (m Mongo) Create(u *users.User) error {
 	if carderr != nil || addrerr != nil {
 		return fmt.Errorf("%v %v", carderr, addrerr)
 	}
+	u = &mu.User
 	return nil
 }
 
-func (m Mongo) createCards(cs []users.Card) ([]bson.ObjectId, error) {
+func (m *Mongo) createCards(cs []users.Card) ([]bson.ObjectId, error) {
 	s := m.Session.Copy()
 	ids := make([]bson.ObjectId, 0)
 	defer s.Close()
@@ -129,7 +133,7 @@ func (m Mongo) createCards(cs []users.Card) ([]bson.ObjectId, error) {
 	return ids, nil
 }
 
-func (m Mongo) createAddresses(as []users.Address) ([]bson.ObjectId, error) {
+func (m *Mongo) createAddresses(as []users.Address) ([]bson.ObjectId, error) {
 	ids := make([]bson.ObjectId, 0)
 	s := m.Session.Copy()
 	defer s.Close()
@@ -147,7 +151,7 @@ func (m Mongo) createAddresses(as []users.Address) ([]bson.ObjectId, error) {
 	return ids, nil
 }
 
-func (m Mongo) cleanAttributes(mu MongoUser) error {
+func (m *Mongo) cleanAttributes(mu MongoUser) error {
 	s := m.Session.Copy()
 	defer s.Close()
 	c := s.DB("").C("addresses")
@@ -155,17 +159,18 @@ func (m Mongo) cleanAttributes(mu MongoUser) error {
 	return err
 }
 
-func (m Mongo) GetByName(name string) (users.User, error) {
+func (m *Mongo) GetByName(name string) (users.User, error) {
 	s := m.Session.Copy()
 	defer s.Close()
 	c := s.DB("").C("customers")
 	mu := New()
-	err := c.Find(bson.M{"username": name}).One(mu)
+	err := c.Find(bson.M{"username": name}).One(&mu)
 	mu.AddUserIDs()
-	return *mu.User, err
+	spew.Dump(mu)
+	return mu.User, err
 }
 
-func (m Mongo) GetByID(id string) (users.User, error) {
+func (m *Mongo) GetByID(id string) (users.User, error) {
 	s := m.Session.Copy()
 	defer s.Close()
 	if !bson.IsObjectIdHex(id) {
@@ -175,10 +180,10 @@ func (m Mongo) GetByID(id string) (users.User, error) {
 	mu := New()
 	err := c.FindId(bson.ObjectIdHex(id)).One(&mu)
 	mu.AddUserIDs()
-	return *mu.User, err
+	return mu.User, err
 }
 
-func (m Mongo) GetAttributes(u *users.User) error {
+func (m *Mongo) GetAttributes(u *users.User) error {
 	s := m.Session.Copy()
 	defer s.Close()
 	ids := make([]bson.ObjectId, 0)
@@ -234,7 +239,7 @@ func getURL() url.URL {
 	}
 }
 
-func (m Mongo) EnsureIndexes() error {
+func (m *Mongo) EnsureIndexes() error {
 	s := m.Session.Copy()
 	defer s.Close()
 	i := mgo.Index{

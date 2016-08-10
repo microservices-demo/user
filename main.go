@@ -24,7 +24,7 @@ var acc string
 func init() {
 	flag.StringVar(&port, "port", "8084", "Port on which to run")
 	flag.BoolVar(&verbose, "verbose", false, "Verbose logging")
-	db.Register("mongodb", mongodb.Mongo{})
+	db.Register("mongodb", &mongodb.Mongo{})
 }
 
 func main() {

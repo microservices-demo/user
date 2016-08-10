@@ -14,10 +14,10 @@ type User struct {
 	FirstName string    `json:"firstName" bson:"firstName"`
 	LastName  string    `json:"lastName" bson:"lastName"`
 	Username  string    `json:"username" bson:"username"`
-	Password  string    `json:"password,omitempty" bson:"password,omitempty"`
+	Password  string    `json:"-" bson:"password,omitempty"`
 	Addresses []Address `json:"addresses,omitempty" bson:"-"`
 	Cards     []Card    `json:"cards,omitempty" bson:"-"`
-	UserID    string    `bson:"-"`
+	UserID    string    `json:"id" bson:"-"`
 }
 
 func New() User {
