@@ -1,4 +1,6 @@
 package: github.com/microservices-demo/user
+excludeDirs:
+- old
 import:
 - package: github.com/go-kit/kit
   version: v0.2.0
