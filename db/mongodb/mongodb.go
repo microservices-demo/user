@@ -3,10 +3,10 @@ package mongodb
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"net/url"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/microservices-demo/user/users"
 
 	"gopkg.in/mgo.v2"
@@ -14,11 +14,13 @@ import (
 )
 
 var (
-	name            string
-	password        string
-	host            string
-	db              = "users"
-	ErrInvalidHexID = errors.New("Invalid Id Hex")
+	name                string
+	password            string
+	host                string
+	db                  = "users"
+	ErrInvalidHexID     = errors.New("Invalid Id Hex")
+	ErrorSavingCardData = errors.New("There was a problem saving some card data")
+	ErrorSavingAddrData = errors.New("There was a problem saving some address data")
 )
 
 func init() {
@@ -37,6 +39,32 @@ type MongoUser struct {
 	AddressIDs []bson.ObjectId `bson:"addresses"`
 	CardIDs    []bson.ObjectId `bson:"cards"`
 }
+
+func New() MongoUser {
+	u := users.New()
+	return MongoUser{
+		User:       &u,
+		AddressIDs: make([]bson.ObjectId, 0),
+		CardIDs:    make([]bson.ObjectId, 0),
+	}
+}
+
+func (mu MongoUser) AddUserIDs() {
+	u := users.New()
+	if mu.User == nil {
+		mu.User = &u
+		return
+	}
+	for _, id := range mu.AddressIDs {
+		mu.User.Addresses = append(mu.User.Addresses, users.Address{
+			ID: id.String(),
+		})
+	}
+	for _, id := range mu.CardIDs {
+		mu.User.Cards = append(mu.User.Cards, users.Card{ID: id.String()})
+	}
+}
+
 type MongoAddress struct {
 	users.Address
 	ID bson.ObjectId `bson:"_id"`
@@ -60,7 +88,9 @@ func (m Mongo) Create(u *users.User) error {
 	s := m.Session.Copy()
 	defer s.Close()
 	id := bson.NewObjectId()
-	mu := MongoUser{User: u, ID: id}
+	mu := New()
+	mu.User = u
+	mu.ID = id
 	var carderr error
 	var addrerr error
 	mu.CardIDs, carderr = m.createCards(u.Cards)
@@ -74,8 +104,10 @@ func (m Mongo) Create(u *users.User) error {
 		return err
 	}
 	mu.User.UserID = mu.ID.Hex()
-	spew.Dump(carderr)
-	spew.Dump(addrerr)
+	// Cheap err for attributes
+	if carderr != nil || addrerr != nil {
+		return fmt.Errorf("%v %v", carderr, addrerr)
+	}
 	return nil
 }
 
@@ -124,14 +156,71 @@ func (m Mongo) cleanAttributes(mu MongoUser) error {
 }
 
 func (m Mongo) GetByName(name string) (users.User, error) {
-	return users.User{}, nil
+	s := m.Session.Copy()
+	defer s.Close()
+	c := s.DB("").C("customers")
+	mu := New()
+	err := c.Find(bson.M{"username": name}).One(mu)
+	mu.AddUserIDs()
+	return *mu.User, err
 }
 
-func (m Mongo) GetByID(name string) (users.User, error) {
-	return users.User{}, nil
+func (m Mongo) GetByID(id string) (users.User, error) {
+	s := m.Session.Copy()
+	defer s.Close()
+	if !bson.IsObjectIdHex(id) {
+		return users.New(), errors.New("Invalid Id Hex")
+	}
+	c := s.DB("").C("customers")
+	mu := New()
+	err := c.FindId(bson.ObjectIdHex(id)).One(&mu)
+	mu.AddUserIDs()
+	return *mu.User, err
 }
 
 func (m Mongo) GetAttributes(u *users.User) error {
+	s := m.Session.Copy()
+	defer s.Close()
+	ids := make([]bson.ObjectId, 0)
+	for _, a := range u.Addresses {
+		if !bson.IsObjectIdHex(a.ID) {
+			return ErrInvalidHexID
+		}
+		ids = append(ids, bson.ObjectIdHex(a.ID))
+	}
+	var ma []MongoAddress
+	c := s.DB("").C("addresses")
+	err := c.Find(bson.M{"_id": bson.M{"$in": ids}}).All(&ma)
+	if err != nil {
+		return err
+	}
+	na := make([]users.Address, 0)
+	for _, a := range ma {
+		a.Address.ID = a.ID.String()
+		na = append(na, a.Address)
+	}
+	u.Addresses = na
+
+	ids = make([]bson.ObjectId, 0)
+	for _, c := range u.Cards {
+		if !bson.IsObjectIdHex(c.ID) {
+			return ErrInvalidHexID
+		}
+		ids = append(ids, bson.ObjectIdHex(c.ID))
+	}
+	var mc []MongoCard
+	c = s.DB("").C("cards")
+	err = c.Find(bson.M{"_id": bson.M{"$in": ids}}).All(&mc)
+	if err != nil {
+		return err
+	}
+
+	nc := make([]users.Card, 0)
+	for _, ca := range mc {
+		ca.Card.ID = ca.ID.String()
+		nc = append(nc, ca.Card)
+	}
+	u.Cards = nc
 	return nil
 }
 
