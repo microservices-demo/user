@@ -2,11 +2,13 @@ package main
 
 import (
 	"flag"
-	"log"
+	"fmt"
 	"net/http"
 
-	"./login"
-	"./register"
+	log "github.com/Sirupsen/logrus"
+
+	"github.com/microservices-demo/user/login"
+	"github.com/microservices-demo/user/register"
 )
 
 var dev bool
@@ -24,6 +26,6 @@ func main() {
 	flag.Parse()
 	http.HandleFunc("/login", login.Handle)
 	http.HandleFunc("/register", register.Handle)
-	log.Printf("Login service running on port %s\n", port)
-	http.ListenAndServe(":"+port, nil)
+	log.Infof("Login service running on port %s\n", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 }

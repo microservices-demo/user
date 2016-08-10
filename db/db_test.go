@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/microservices-demo/user/users"
@@ -10,6 +11,7 @@ import (
 var (
 	TestDB       = fake{}
 	ErrFakeError = errors.New("Fake error")
+	TestAddress  = users.Address{"street", "51b", "Netherlands", "Amst    erdam", "000056"}
 )
 
 func TestInit(t *testing.T) {
@@ -45,10 +47,28 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestGet(t *testing.T) {
-	_, err := Get("test")
+func TestGetById(t *testing.T) {
+	_, err := GetByID("test")
 	if err != ErrFakeError {
 		t.Error("expected fake db error from get")
+	}
+}
+
+func TestGetByName(t *testing.T) {
+	_, err := GetByName("test")
+	if err != ErrFakeError {
+		t.Error("expected fake db error from get")
+	}
+}
+
+func TestGetAttributes(t *testing.T) {
+	u := users.New()
+	GetAttributes(&u)
+	if len(u.Addresses) != 1 {
+		t.Error("expected one address added for GetAttributes")
+	}
+	if !reflect.DeepEqual(u.Addresses[0], TestAddress) {
+		t.Error("expected matching addresses")
 	}
 }
 
@@ -57,8 +77,15 @@ type fake struct{}
 func (f fake) Init() error {
 	return ErrFakeError
 }
-func (f fake) Get(name string) (users.User, error) {
+func (f fake) GetByName(name string) (users.User, error) {
 	return users.User{}, ErrFakeError
+}
+func (f fake) GetByID(name string) (users.User, error) {
+	return users.User{}, ErrFakeError
+}
+func (f fake) GetAttributes(u *users.User) error {
+	u.Addresses = append(u.Addresses, TestAddress)
+	return nil
 }
 func (f fake) Create(users.User) error {
 	return ErrFakeError

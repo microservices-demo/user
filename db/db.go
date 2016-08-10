@@ -13,7 +13,9 @@ import (
 type Database interface {
 	Init() error
 	Create(users.User) error
-	Get(string) (users.User, error)
+	GetByName(string) (users.User, error)
+	GetByID(string) (users.User, error)
+	GetAttributes(*users.User) error
 }
 
 var (
@@ -51,6 +53,14 @@ func Create(u users.User) error {
 	return DefaultDb.Create(u)
 }
 
-func Get(n string) (users.User, error) {
-	return DefaultDb.Get(n)
+func GetByName(n string) (users.User, error) {
+	return DefaultDb.GetByName(n)
+}
+
+func GetByID(n string) (users.User, error) {
+	return DefaultDb.GetByID(n)
+}
+
+func GetAttributes(u *users.User) error {
+	return DefaultDb.GetAttributes(u)
 }

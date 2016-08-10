@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"../accounts"
-	"../login"
 	log "github.com/Sirupsen/logrus"
+	"github.com/microservices-demo/user/db"
+	"github.com/microservices-demo/user/login"
+	"github.com/microservices-demo/user/users"
 )
 
 type Registration struct {
-	Address  *accounts.Address  `json:"address"`
-	Card     *accounts.Card     `json:"card"`
-	Customer *accounts.Customer `json:"customer"`
+	Address users.Address `json:"address"`
+	Card    users.Card    `json:"card"`
+	User    users.User    `json:"customer"`
 }
 
 func Handle(w http.ResponseWriter, r *http.Request) {
@@ -24,28 +25,15 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		return
 	}
-	err = reg.Address.Create()
-	return
+	reg.User.Addresses = []users.Address{reg.Address}
+	reg.User.Cards = []users.Card{reg.Card}
+	err = db.Create(reg.User)
 	if err != nil {
 		log.Error(err)
-		w.WriteHeader(400)
+		w.WriteHeader(500)
 		return
 	}
-	reg.Customer.Addresses = []string{reg.Address.Links.Self.Href}
-	err = reg.Card.Create()
-	if err != nil {
-		log.Error(err)
-		w.WriteHeader(400)
-		return
-	}
-	reg.Customer.Cards = []string{reg.Card.Links.Self.Href}
-	err = reg.Customer.Create()
-	if err != nil {
-		log.Error(err)
-		w.WriteHeader(400)
-		return
-	}
-	l := login.NewLoginClaims(*reg.Customer)
+	l := login.NewLoginClaims(reg.User)
 	log.Debug("Customer id: %s\n", l.Id)
 	signed, err := l.GetToken()
 

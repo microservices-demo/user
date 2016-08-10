@@ -44,6 +44,12 @@ func TestCreate(t *testing.T) {
 
 }
 
-func TestGet(t *testing.T) {
+func TestGetByName(t *testing.T) {
+
+}
+func TestGetByID(t *testing.T) {
+
+}
+func TestGetAttributes(t *testing.T) {
 
 }

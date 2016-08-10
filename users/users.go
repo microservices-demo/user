@@ -11,12 +11,17 @@ var (
 )
 
 type User struct {
-	FirstName string   `json:"firstName"`
-	LastName  string   `json:"lastName"`
-	Username  string   `json:"username"`
-	Password  string   `json:"password,omitempty"`
-	Addresses []string `json:"addresses,omitempty"`
-	Cards     []string `json:"cards,omitempty"`
+	FirstName string    `json:"firstName" bson:"firstName"`
+	LastName  string    `json:"lastName" bson:"lastName"`
+	Username  string    `json:"username" bson:"username"`
+	Password  string    `json:"password,omitempty" bson:"password,omitempty"`
+	Addresses []Address `json:"addresses,omitempty" bson:"-"`
+	Cards     []Card    `json:"cards,omitempty" bson:"-"`
+	UserID    string    `bson:"-"`
+}
+
+func New() User {
+	return User{Addresses: make([]Address, 0), Cards: make([]Card, 0)}
 }
 
 func (c *User) Validate() error {
