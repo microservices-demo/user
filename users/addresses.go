@@ -6,4 +6,5 @@ type Address struct {
 	Country  string `json:"country" bson:"country,omitempty"`
 	City     string `json:"city" bson:"city,omitempty"`
 	PostCode string `json:"postcode" bson:"postcode,omitempty"`
+	ID       string `bson:"-"`
 }
