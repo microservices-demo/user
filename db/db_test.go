@@ -11,7 +11,13 @@ import (
 var (
 	TestDB       = fake{}
 	ErrFakeError = errors.New("Fake error")
-	TestAddress  = users.Address{"street", "51b", "Netherlands", "Amst    erdam", "000056"}
+	TestAddress  = users.Address{
+		Street:  "street",
+		Number:  "51b",
+		Country: "Netherlands",
+		City:    "Amsterdam",
+		ID:      "000056",
+	}
 )
 
 func TestInit(t *testing.T) {

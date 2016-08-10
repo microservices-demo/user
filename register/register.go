@@ -27,7 +27,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	}
 	reg.User.Addresses = []users.Address{reg.Address}
 	reg.User.Cards = []users.Card{reg.Card}
-	err = db.Create(reg.User)
+	err = db.Create(&reg.User)
 	if err != nil {
 		log.Error(err)
 		w.WriteHeader(500)
