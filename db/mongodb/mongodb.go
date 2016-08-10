@@ -47,7 +47,10 @@ func (m Mongo) Init() error {
 	u := getURL()
 	var err error
 	m.Session, err = mgo.Dial(u.String())
-	return err
+	if err != nil {
+		return err
+	}
+	return m.EnsureIndexes()
 }
 
 func (m Mongo) Create(u users.User) error {
@@ -74,4 +77,18 @@ func getURL() url.URL {
 		Host:   host,
 		Path:   db,
 	}
+}
+
+func (m Mongo) EnsureIndexes() error {
+	s := m.Session.Copy()
+	defer s.Close()
+	i := mgo.Index{
+		Key:        []string{"username"},
+		Unique:     true,
+		DropDups:   true,
+		Background: true,
+		Sparse:     false,
+	}
+	c := s.DB("").C("users")
+	return c.EnsureIndex(i)
 }

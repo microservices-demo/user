@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -19,17 +20,22 @@ type Database interface {
 }
 
 var (
-	database           string
-	DefaultDb          Database
-	DBTypes            map[string]Database = map[string]Database{}
-	ErrNoDatabaseFound                     = "No database with name %v registered"
+	database              string
+	DefaultDb             Database
+	DBTypes               map[string]Database = map[string]Database{}
+	ErrNoDatabaseFound                        = "No database with name %v registered"
+	ErrNoDatabaseSelected                     = errors.New("No DB selected")
 )
 
 func init() {
-	flag.StringVar(&database, "database", os.Getenv("USER_DATABASE"), "Database to use, Mongolar or ...")
+	flag.StringVar(&database, "database", os.Getenv("USER_DATABASE"), "Database to use, Mongodb or ...")
+
 }
 
 func Init() error {
+	if database == "" {
+		return ErrNoDatabaseSelected
+	}
 	err := Set()
 	if err != nil {
 		return err
