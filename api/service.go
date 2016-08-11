@@ -72,7 +72,11 @@ func (s *fixedService) GetUsers(id string) ([]users.User, error) {
 	return []users.User{u}, err
 }
 
-func (s *fixedService) PostUser(users.User) bool {
+func (s *fixedService) PostUser(user users.User) bool {
+	err := db.CreateUser(&user)
+	if err != nil {
+		return false
+	}
 	return true
 }
 
@@ -85,6 +89,10 @@ func (s *fixedService) GetAddresses(id string) ([]users.Address, error) {
 }
 
 func (s *fixedService) PostAddress(add users.Address, userid string) bool {
+	err := db.CreateAddress(&add, userid)
+	if err != nil {
+		return false
+	}
 	return true
 }
 
@@ -97,6 +105,10 @@ func (s *fixedService) GetCards(id string) ([]users.Card, error) {
 }
 
 func (s *fixedService) PostCard(card users.Card, userid string) bool {
+	err := db.CreateCard(&card, userid)
+	if err != nil {
+		return false
+	}
 	return true
 }
 
