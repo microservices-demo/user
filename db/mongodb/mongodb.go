@@ -33,6 +33,16 @@ type Mongo struct {
 	Session *mgo.Session
 }
 
+func (m *Mongo) Init() error {
+	u := getURL()
+	var err error
+	m.Session, err = mgo.Dial(u.String())
+	if err != nil {
+		return err
+	}
+	return m.EnsureIndexes()
+}
+
 type MongoUser struct {
 	users.User `bson:",inline"`
 	ID         bson.ObjectId   `bson:"_id"`
@@ -83,16 +93,6 @@ type MongoCard struct {
 
 func (m *MongoCard) AddID() {
 	m.Card.ID = m.ID.Hex()
-}
-
-func (m *Mongo) Init() error {
-	u := getURL()
-	var err error
-	m.Session, err = mgo.Dial(u.String())
-	if err != nil {
-		return err
-	}
-	return m.EnsureIndexes()
 }
 
 func (m *Mongo) CreateUser(u *users.User) error {
