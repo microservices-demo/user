@@ -40,6 +40,8 @@ func (s *fixedService) Login(username, password string) (users.User, error) {
 	if u.Password != calculatePassHash(password) {
 		return users.New(), ErrUnauthorized
 	}
+	db.GetAttributes(&u)
+	u.MaskCCs()
 	return u, nil
 
 }

@@ -24,18 +24,25 @@ func New() User {
 	return User{Addresses: make([]Address, 0), Cards: make([]Card, 0)}
 }
 
-func (c *User) Validate() error {
-	if c.FirstName == "" {
+func (u *User) Validate() error {
+	if u.FirstName == "" {
 		return fmt.Errorf(ErrMissingField, "FirstName")
 	}
-	if c.LastName == "" {
+	if u.LastName == "" {
 		return fmt.Errorf(ErrMissingField, "LastName")
 	}
-	if c.Username == "" {
+	if u.Username == "" {
 		return fmt.Errorf(ErrMissingField, "Username")
 	}
-	if c.Password == "" {
+	if u.Password == "" {
 		return fmt.Errorf(ErrMissingField, "Password")
 	}
 	return nil
+}
+
+func (u *User) MaskCCs() {
+	for k, c := range u.Cards {
+		c.MaskCC()
+		u.Cards[k] = c
+	}
 }

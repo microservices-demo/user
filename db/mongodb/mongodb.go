@@ -69,12 +69,12 @@ func (mu *MongoUser) AddUserIDs() {
 }
 
 type MongoAddress struct {
-	users.Address
-	ID bson.ObjectId `bson:"_id"`
+	users.Address `bson:",inline"`
+	ID            bson.ObjectId `bson:"_id"`
 }
 type MongoCard struct {
-	users.Card
-	ID bson.ObjectId `bson:"_id"`
+	users.Card `bson:",inline"`
+	ID         bson.ObjectId `bson:"_id"`
 }
 
 func (m *Mongo) Init() error {
@@ -128,7 +128,7 @@ func (m *Mongo) createCards(cs []users.Card) ([]bson.ObjectId, error) {
 			return ids, err
 		}
 		ids = append(ids, id)
-		cs[k].ID = id.String()
+		cs[k].ID = id.Hex()
 	}
 	return ids, nil
 }
@@ -146,7 +146,7 @@ func (m *Mongo) createAddresses(as []users.Address) ([]bson.ObjectId, error) {
 			return ids, err
 		}
 		ids = append(ids, id)
-		as[k].ID = id.String()
+		as[k].ID = id.Hex()
 	}
 	return ids, nil
 }
@@ -166,7 +166,6 @@ func (m *Mongo) GetByName(name string) (users.User, error) {
 	mu := New()
 	err := c.Find(bson.M{"username": name}).One(&mu)
 	mu.AddUserIDs()
-	spew.Dump(mu)
 	return mu.User, err
 }
 
@@ -196,12 +195,13 @@ func (m *Mongo) GetAttributes(u *users.User) error {
 	var ma []MongoAddress
 	c := s.DB("").C("addresses")
 	err := c.Find(bson.M{"_id": bson.M{"$in": ids}}).All(&ma)
+	spew.Dump(ma)
 	if err != nil {
 		return err
 	}
 	na := make([]users.Address, 0)
 	for _, a := range ma {
-		a.Address.ID = a.ID.String()
+		a.Address.ID = a.ID.Hex()
 		na = append(na, a.Address)
 	}
 	u.Addresses = na
@@ -222,7 +222,7 @@ func (m *Mongo) GetAttributes(u *users.User) error {
 
 	nc := make([]users.Card, 0)
 	for _, ca := range mc {
-		ca.Card.ID = ca.ID.String()
+		ca.Card.ID = ca.ID.Hex()
 		nc = append(nc, ca.Card)
 	}
 	u.Cards = nc
