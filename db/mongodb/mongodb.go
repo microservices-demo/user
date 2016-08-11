@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/microservices-demo/user/users"
 
 	"gopkg.in/mgo.v2"
@@ -195,7 +194,6 @@ func (m *Mongo) GetAttributes(u *users.User) error {
 	var ma []MongoAddress
 	c := s.DB("").C("addresses")
 	err := c.Find(bson.M{"_id": bson.M{"$in": ids}}).All(&ma)
-	spew.Dump(ma)
 	if err != nil {
 		return err
 	}
