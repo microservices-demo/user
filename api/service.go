@@ -39,14 +39,14 @@ func NewFixedService() Service {
 type fixedService struct{}
 
 func (s *fixedService) Login(username, password string) (users.User, error) {
-	u, err := db.GetByName(username)
+	u, err := db.GetUserByName(username)
 	if err != nil {
 		return users.New(), err
 	}
 	if u.Password != calculatePassHash(password) {
 		return users.New(), ErrUnauthorized
 	}
-	db.GetAttributes(&u)
+	db.GetUserAttributes(&u)
 	u.MaskCCs()
 	return u, nil
 
@@ -57,7 +57,7 @@ func (s *fixedService) Register(username, password, email string) bool {
 	u.Username = username
 	u.Password = calculatePassHash(password)
 	u.Email = email
-	err := db.Create(&u)
+	err := db.CreateUser(&u)
 	if err != nil {
 		return false
 	}

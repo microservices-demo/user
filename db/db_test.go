@@ -54,24 +54,24 @@ func TestCreate(t *testing.T) {
 }
 
 func TestGetById(t *testing.T) {
-	_, err := GetByID("test")
+	_, err := GetUser("test")
 	if err != ErrFakeError {
 		t.Error("expected fake db error from get")
 	}
 }
 
-func TestGetByName(t *testing.T) {
-	_, err := GetByName("test")
+func TestGetUserName(t *testing.T) {
+	_, err := GetUserName("test")
 	if err != ErrFakeError {
 		t.Error("expected fake db error from get")
 	}
 }
 
-func TestGetAttributes(t *testing.T) {
+func TestGetUserAttributes(t *testing.T) {
 	u := users.New()
-	GetAttributes(&u)
+	GetUserAttributes(&u)
 	if len(u.Addresses) != 1 {
-		t.Error("expected one address added for GetAttributes")
+		t.Error("expected one address added for GetUserAttributes")
 	}
 	if !reflect.DeepEqual(u.Addresses[0], TestAddress) {
 		t.Error("expected matching addresses")
@@ -83,16 +83,16 @@ type fake struct{}
 func (f fake) Init() error {
 	return ErrFakeError
 }
-func (f fake) GetByName(name string) (users.User, error) {
+func (f fake) GetUserByName(name string) (users.User, error) {
 	return users.User{}, ErrFakeError
 }
-func (f fake) GetByID(name string) (users.User, error) {
+func (f fake) GetUser(name string) (users.User, error) {
 	return users.User{}, ErrFakeError
 }
-func (f fake) GetAttributes(u *users.User) error {
+func (f fake) GetUserAttributes(u *users.User) error {
 	u.Addresses = append(u.Addresses, TestAddress)
 	return nil
 }
-func (f fake) Create(*users.User) error {
+func (f fake) CreateUser(*users.User) error {
 	return ErrFakeError
 }
