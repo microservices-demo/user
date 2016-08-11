@@ -299,9 +299,12 @@ func (m *Mongo) CreateCard(ca *users.Card, userid string) error {
 	if err != nil {
 		return err
 	}
-	err = m.appendAttributeId("cards", mc.ID, userid)
-	if err != nil {
-		return err
+	// Address for anonymous user
+	if id != "" {
+		err = m.appendAttributeId("cards", mc.ID, userid)
+		if err != nil {
+			return err
+		}
 	}
 	mc.AddID()
 	ca = &mc.Card
@@ -348,11 +351,13 @@ func (m *Mongo) CreateAddress(a *users.Address, userid string) error {
 	if err != nil {
 		return err
 	}
-	err = m.appendAttributeId("addresses", ma.ID, userid)
-	if err != nil {
-		return err
+	// Address for anonymous user
+	if id != "" {
+		err = m.appendAttributeId("addresses", ma.ID, userid)
+		if err != nil {
+			return err
+		}
 	}
-
 	ma.AddID()
 	a = &ma.Address
 	return err
