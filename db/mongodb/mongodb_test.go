@@ -43,7 +43,7 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestGetUserName(t *testing.T) {
+func TestGetUserByName(t *testing.T) {
 
 }
 func TestGetUser(t *testing.T) {
