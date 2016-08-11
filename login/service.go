@@ -22,7 +22,7 @@ var (
 type Service interface {
 	Login(username, password string) (users.User, error) // GET /login
 	// Only used for testing at the moment
-	Register(username, password string) bool
+	Register(username, password, email string) bool
 }
 
 // NewFixedService returns a simple implementation of the Service interface,
@@ -46,10 +46,11 @@ func (s *fixedService) Login(username, password string) (users.User, error) {
 
 }
 
-func (s *fixedService) Register(username, password string) bool {
+func (s *fixedService) Register(username, password, email string) bool {
 	u := users.New()
 	u.Username = username
 	u.Password = calculatePassHash(password)
+	u.Email = email
 	err := db.Create(&u)
 	if err != nil {
 		return false

@@ -39,14 +39,15 @@ func (mw loggingMiddleware) Login(username, password string) (user users.User, e
 	return mw.next.Login(username, password)
 }
 
-func (mw loggingMiddleware) Register(username, password string) (status bool) {
+func (mw loggingMiddleware) Register(username, password, email string) (status bool) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "Register",
 			"username", username,
+			"email", email,
 			"result", status,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	return mw.next.Register(username, password)
+	return mw.next.Register(username, password, email)
 }

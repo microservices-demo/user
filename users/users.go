@@ -13,6 +13,7 @@ var (
 type User struct {
 	FirstName string    `json:"firstName" bson:"firstName"`
 	LastName  string    `json:"lastName" bson:"lastName"`
+	Email     string    `json:"email" bson:"email"`
 	Username  string    `json:"username" bson:"username"`
 	Password  string    `json:"-" bson:"password,omitempty"`
 	Addresses []Address `json:"addresses,omitempty" bson:"-"`

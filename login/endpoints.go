@@ -42,7 +42,7 @@ func MakeLoginEndpoint(s Service) endpoint.Endpoint {
 func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(registerRequest)
-		status := s.Register(req.Username, req.Password)
+		status := s.Register(req.Username, req.Password, req.Email)
 		return registerResponse{Status: status}, err
 	}
 }
@@ -66,6 +66,7 @@ type loginResponse struct {
 type registerRequest struct {
 	Username string
 	Password string
+	Email    string
 }
 
 type registerResponse struct {

@@ -32,7 +32,7 @@ func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger) http.H
 		encodeResponse,
 		options...,
 	))
-	r.Methods("GET").Path("/register").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/register").Handler(httptransport.NewServer(
 		ctx,
 		e.RegisterEndpoint,
 		decodeRegisterRequest,
@@ -79,10 +79,12 @@ func decodeLoginRequest(_ context.Context, r *http.Request) (interface{}, error)
 func decodeRegisterRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	u := r.FormValue("username")
 	p := r.FormValue("password")
+	e := r.FormValue("email")
 
 	return registerRequest{
 		Username: u,
 		Password: p,
+		Email:    e,
 	}, nil
 }
 
