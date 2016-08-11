@@ -23,6 +23,12 @@ type Service interface {
 	Login(username, password string) (users.User, error) // GET /login
 	// Only used for testing at the moment
 	Register(username, password, email string) bool
+	GetUsers(id string) ([]users.User, error)
+	PostUser(u users.User) bool
+	GetAddresses(id string) ([]users.Address, error)
+	PostAddress(u users.Address, userid string) bool
+	GetCards(id string) ([]users.Card, error)
+	PostCard(u users.Card, userid string) bool
 }
 
 // NewFixedService returns a simple implementation of the Service interface,
@@ -55,6 +61,30 @@ func (s *fixedService) Register(username, password, email string) bool {
 	if err != nil {
 		return false
 	}
+	return true
+}
+
+func (s *fixedService) GetUsers(id string) ([]users.User, error) {
+	return make([]users.User, 0), nil
+}
+
+func (s *fixedService) PostUser(users.User) bool {
+	return true
+}
+
+func (s *fixedService) GetAddresses(id string) ([]users.Address, error) {
+	return make([]users.Address, 0), nil
+}
+
+func (s *fixedService) PostAddress(add users.Address, userid string) bool {
+	return true
+}
+
+func (s *fixedService) GetCards(id string) ([]users.Card, error) {
+	return make([]users.Card, 0), nil
+}
+
+func (s *fixedService) PostCard(card users.Card, userid string) bool {
 	return true
 }
 

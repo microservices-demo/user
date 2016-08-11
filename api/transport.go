@@ -6,6 +6,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -36,6 +37,48 @@ func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger) http.H
 		ctx,
 		e.RegisterEndpoint,
 		decodeRegisterRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("GET").PathPrefix("/customer").Handler(httptransport.NewServer(
+		ctx,
+		e.UserGetEndpoint,
+		decodeGetRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("GET").PathPrefix("/card").Handler(httptransport.NewServer(
+		ctx,
+		e.CardGetEndpoint,
+		decodeGetRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("GET").PathPrefix("/address").Handler(httptransport.NewServer(
+		ctx,
+		e.AddressGetEndpoint,
+		decodeGetRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("POST").Path("/customer").Handler(httptransport.NewServer(
+		ctx,
+		e.UserPostEndpoint,
+		decodeUserRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("POST").Path("/address").Handler(httptransport.NewServer(
+		ctx,
+		e.AddressPostEndpoint,
+		decodeAddressRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("POST").Path("/card").Handler(httptransport.NewServer(
+		ctx,
+		e.CardPostEndpoint,
+		decodeCardRequest,
 		encodeResponse,
 		options...,
 	))
@@ -86,6 +129,45 @@ func decodeRegisterRequest(_ context.Context, r *http.Request) (interface{}, err
 		Password: p,
 		Email:    e,
 	}, nil
+}
+
+func decodeGetRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	g := GetRequest{}
+	u := strings.Split(r.URL.Path, "/")
+	if len(u) > 1 {
+		g.ID = u[1]
+	}
+	return g, nil
+}
+
+func decodeUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	defer r.Body.Close()
+	u := userPostRequest{}
+	err := json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func decodeAddressRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	defer r.Body.Close()
+	a := addressPostRequest{}
+	err := json.NewDecoder(r.Body).Decode(&a)
+	if err != nil {
+		return nil, err
+	}
+	return a, nil
+}
+
+func decodeCardRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	defer r.Body.Close()
+	c := cardPostRequest{}
+	err := json.NewDecoder(r.Body).Decode(&c)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func decodeHealthRequest(_ context.Context, r *http.Request) (interface{}, error) {
