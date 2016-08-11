@@ -65,7 +65,11 @@ func (s *fixedService) Register(username, password, email string) bool {
 }
 
 func (s *fixedService) GetUsers(id string) ([]users.User, error) {
-	return make([]users.User, 0), nil
+	if id == "" {
+		return db.GetUsers()
+	}
+	u, err := db.GetUser(id)
+	return []users.User{u}, err
 }
 
 func (s *fixedService) PostUser(users.User) bool {
@@ -73,7 +77,11 @@ func (s *fixedService) PostUser(users.User) bool {
 }
 
 func (s *fixedService) GetAddresses(id string) ([]users.Address, error) {
-	return make([]users.Address, 0), nil
+	if id == "" {
+		return db.GetAddresses()
+	}
+	a, err := db.GetAddress(id)
+	return []users.Address{a}, err
 }
 
 func (s *fixedService) PostAddress(add users.Address, userid string) bool {
@@ -81,7 +89,11 @@ func (s *fixedService) PostAddress(add users.Address, userid string) bool {
 }
 
 func (s *fixedService) GetCards(id string) ([]users.Card, error) {
-	return make([]users.Card, 0), nil
+	if id == "" {
+		return db.GetCards()
+	}
+	c, err := db.GetCard(id)
+	return []users.Card{c}, err
 }
 
 func (s *fixedService) PostCard(card users.Card, userid string) bool {
