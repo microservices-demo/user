@@ -24,6 +24,7 @@ var (
 	}
 )
 
+/*
 func TestMain(m *testing.M) {
 	TestServer.SetPath("/tmp")
 	TestMongo.Session = TestServer.Session()
@@ -37,7 +38,7 @@ func exitTest() {
 }
 
 func TestCreate(t *testing.T) {
-	err := TestMongo.Create(&TestUser)
+	err := TestMongo.CreateUser(&TestUser)
 	if err != nil {
 		t.Error(err)
 	}
@@ -52,7 +53,7 @@ func TestGetUser(t *testing.T) {
 func TestGetUserAttributes(t *testing.T) {
 
 }
-
+*/
 func TestGetURL(t *testing.T) {
 	name = "test"
 	password = "password"
