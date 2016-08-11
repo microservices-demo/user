@@ -134,8 +134,8 @@ func decodeRegisterRequest(_ context.Context, r *http.Request) (interface{}, err
 func decodeGetRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	g := GetRequest{}
 	u := strings.Split(r.URL.Path, "/")
-	if len(u) > 1 {
-		g.ID = u[1]
+	if len(u) == 3 {
+		g.ID = u[2]
 	}
 	return g, nil
 }
