@@ -125,6 +125,7 @@ func (m *Mongo) CreateUser(u *users.User) error {
 
 func (m *Mongo) createCards(cs []users.Card) ([]bson.ObjectId, error) {
 	s := m.Session.Copy()
+	defer s.Close()
 	ids := make([]bson.ObjectId, 0)
 	defer s.Close()
 	for k, ca := range cs {
