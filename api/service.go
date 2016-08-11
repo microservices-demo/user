@@ -1,4 +1,4 @@
-package login
+package api
 
 // service.go contains the definition and implementation (business logic) of the
 // login service. Everything here is agnostic to the transport (HTTP).

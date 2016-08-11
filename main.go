@@ -11,9 +11,9 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/go-kit/kit/log"
+	"github.com/microservices-demo/user/api"
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/db/mongodb"
-	"github.com/microservices-demo/user/login"
 )
 
 var dev bool
@@ -48,19 +48,19 @@ func main() {
 	}
 
 	// Service domain.
-	var service login.Service
+	var service api.Service
 	{
-		service = login.NewFixedService()
-		service = login.LoggingMiddleware(logger)(service)
+		service = api.NewFixedService()
+		service = api.LoggingMiddleware(logger)(service)
 	}
 
 	// Endpoint domain.
-	endpoints := login.MakeEndpoints(service)
+	endpoints := api.MakeEndpoints(service)
 
 	// Create and launch the HTTP server.
 	go func() {
 		logger.Log("transport", "HTTP", "port", port)
-		handler := login.MakeHTTPHandler(ctx, endpoints, logger)
+		handler := api.MakeHTTPHandler(ctx, endpoints, logger)
 		errc <- http.ListenAndServe(fmt.Sprintf(":%v", port), handler)
 	}()
 
@@ -73,10 +73,3 @@ func main() {
 
 	logger.Log("exit", <-errc)
 }
-
-/*
-	http.HandleFunc("/login", login.Handle)
-	http.HandleFunc("/register", register.Handle)
-	log.Infof("Login service running on port %s\n", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
-*/

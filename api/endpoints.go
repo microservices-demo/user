@@ -1,4 +1,4 @@
-package login
+package api
 
 // endpoints.go contains the endpoint definitions, including per-method request
 // and response structs. Endpoints are the binding between the service and
