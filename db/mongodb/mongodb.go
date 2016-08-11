@@ -314,7 +314,7 @@ func (m *Mongo) GetAddress(id string) (users.Address, error) {
 	if !bson.IsObjectIdHex(id) {
 		return users.Address{}, errors.New("Invalid Id Hex")
 	}
-	c := s.DB("").C("address")
+	c := s.DB("").C("addresses")
 	ma := MongoAddress{}
 	err := c.FindId(bson.ObjectIdHex(id)).One(&ma)
 	ma.AddID()
@@ -324,7 +324,7 @@ func (m *Mongo) GetAddress(id string) (users.Address, error) {
 func (m *Mongo) GetAddresses() ([]users.Address, error) {
 	s := m.Session.Copy()
 	defer s.Close()
-	c := s.DB("").C("cards")
+	c := s.DB("").C("addresses")
 	var mas []MongoAddress
 	err := c.Find(nil).All(&mas)
 	as := make([]users.Address, 0)
