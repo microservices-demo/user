@@ -11,6 +11,7 @@ script:
     - go test -v -covermode=count -coverprofile=profile.coverprofile
     - go test -v -covermode=count -coverprofile=db.coverprofile ./db
     - go test -v -covermode=count -coverprofile=mongo.coverprofile ./db/mongodb
+    - go test -v -covermode=count -coverprofile=api.coverprofile ./api
 after_success:
     - go get -v github.com/mattn/goveralls
     - go get github.com/modocache/gover
