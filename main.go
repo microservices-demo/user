@@ -17,13 +17,11 @@ import (
 )
 
 var dev bool
-var verbose bool
 var port string
 var acc string
 
 func init() {
 	flag.StringVar(&port, "port", "8084", "Port on which to run")
-	flag.BoolVar(&verbose, "verbose", false, "Verbose logging")
 	db.Register("mongodb", &mongodb.Mongo{})
 }
 
