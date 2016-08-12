@@ -1,4 +1,4 @@
-FRO ttach  golang:1.6-wheezy
+FROM golang:1.6-wheezy
 ENV sourcesdir /go/src/github.com/microservices-demo/user/
 ENV MONGO_HOST localhost
 ENV USER_DATABASE mongodb

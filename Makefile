@@ -1,4 +1,4 @@
-NAME = microservices-demo/user
+NAME = weaveworksdemos/user
 INSTANCE = user
 
 default: build
