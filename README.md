@@ -1,5 +1,6 @@
 #User Service
-
+[![Build Status](https://travis-ci.org/microservices-demo/user.svg?branch=master)](https://travis-ci.org/microservices-demo/user)
+[![Coverage Status](https://coveralls.io/repos/github/microservices-demo/user/badge.svg?branch=master)](https://coveralls.io/github/microservices-demo/user?branch=master)
 This service covers user account storage, to include cards and addresses
 
 ##Build
