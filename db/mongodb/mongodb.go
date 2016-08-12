@@ -362,14 +362,18 @@ func (m *Mongo) CreateAddress(a *users.Address, userid string) error {
 	a = &ma.Address
 	return err
 }
+
 func getURL() url.URL {
-	u := url.UserPassword(name, password)
-	return url.URL{
+	ur := url.URL{
 		Scheme: "mongodb",
-		User:   u,
 		Host:   host,
 		Path:   db,
 	}
+	if name != "" {
+		u := url.UserPassword(name, password)
+		ur.User = u
+	}
+	return ur
 }
 
 func (m *Mongo) EnsureIndexes() error {
