@@ -382,6 +382,6 @@ func (m *Mongo) EnsureIndexes() error {
 		Background: true,
 		Sparse:     false,
 	}
-	c := s.DB("").C("users")
+	c := s.DB("").C("customers")
 	return c.EnsureIndex(i)
 }
