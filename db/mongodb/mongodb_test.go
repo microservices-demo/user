@@ -24,36 +24,62 @@ var (
 	}
 )
 
-/*
-func TestMain(m *testing.M) {
+func init() {
 	TestServer.SetPath("/tmp")
+}
+
+func TestMain(m *testing.M) {
 	TestMongo.Session = TestServer.Session()
+	TestMongo.EnsureIndexes()
+	TestMongo.Session.Close()
 	defer exitTest()
 	m.Run()
 }
 
 func exitTest() {
-	TestMongo.Session.Close()
+	TestServer.Wipe()
 	TestServer.Stop()
 }
 
 func TestCreate(t *testing.T) {
+	TestMongo.Session = TestServer.Session()
+	defer TestMongo.Session.Close()
 	err := TestMongo.CreateUser(&TestUser)
 	if err != nil {
 		t.Error(err)
 	}
+	err = TestMongo.CreateUser(&TestUser)
+	if err == nil {
+		t.Error("Expected duplicate key error")
+	}
 }
 
 func TestGetUserByName(t *testing.T) {
-
+	TestMongo.Session = TestServer.Session()
+	defer TestMongo.Session.Close()
+	u, err := TestMongo.GetUserByName(TestUser.Username)
+	if err != nil {
+		t.Error(err)
+	}
+	if u.Username != TestUser.Username {
+		t.Error("expected equal usernames")
+	}
+	_, err = TestMongo.GetUserByName("bogususers")
+	if err == nil {
+		t.Error("expected not found error")
+	}
 }
+
 func TestGetUser(t *testing.T) {
+	TestMongo.Session = TestServer.Session()
+	defer TestMongo.Session.Close()
 
 }
 func TestGetUserAttributes(t *testing.T) {
+	TestMongo.Session = TestServer.Session()
+	defer TestMongo.Session.Close()
 
 }
-*/
 func TestGetURL(t *testing.T) {
 	name = "test"
 	password = "password"
