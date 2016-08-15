@@ -14,6 +14,10 @@ import (
 	"golang.org/x/net/context"
 )
 
+type EmbedStruct struct {
+	Embed interface{} `json:"_embedded"`
+}
+
 // MakeHTTPHandler mounts the endpoints into a REST-y HTTP handler.
 func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger) http.Handler {
 	r := mux.NewRouter().StrictSlash(false)
@@ -40,42 +44,42 @@ func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger) http.H
 		encodeResponse,
 		options...,
 	))
-	r.Methods("GET").PathPrefix("/customer").Handler(httptransport.NewServer(
+	r.Methods("GET").PathPrefix("/customers").Handler(httptransport.NewServer(
 		ctx,
 		e.UserGetEndpoint,
 		decodeGetRequest,
-		encodeResponse,
+		encodeEmbedResponse,
 		options...,
 	))
-	r.Methods("GET").PathPrefix("/card").Handler(httptransport.NewServer(
+	r.Methods("GET").PathPrefix("/cards").Handler(httptransport.NewServer(
 		ctx,
 		e.CardGetEndpoint,
 		decodeGetRequest,
-		encodeResponse,
+		encodeEmbedResponse,
 		options...,
 	))
-	r.Methods("GET").PathPrefix("/address").Handler(httptransport.NewServer(
+	r.Methods("GET").PathPrefix("/addresses").Handler(httptransport.NewServer(
 		ctx,
 		e.AddressGetEndpoint,
 		decodeGetRequest,
-		encodeResponse,
+		encodeEmbedResponse,
 		options...,
 	))
-	r.Methods("POST").Path("/customer").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/customers").Handler(httptransport.NewServer(
 		ctx,
 		e.UserPostEndpoint,
 		decodeUserRequest,
 		encodeResponse,
 		options...,
 	))
-	r.Methods("POST").Path("/address").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/addresses").Handler(httptransport.NewServer(
 		ctx,
 		e.AddressPostEndpoint,
 		decodeAddressRequest,
 		encodeResponse,
 		options...,
 	))
-	r.Methods("POST").Path("/card").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/cards").Handler(httptransport.NewServer(
 		ctx,
 		e.CardPostEndpoint,
 		decodeCardRequest,
@@ -182,4 +186,11 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 	// All of our response objects are JSON serializable, so we just do that.
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	return json.NewEncoder(w).Encode(response)
+}
+
+func encodeEmbedResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	// All of our response objects are JSON serializable, so we just do that.
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	er := EmbedStruct{Embed: response}
+	return json.NewEncoder(w).Encode(er)
 }
