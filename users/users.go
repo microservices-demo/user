@@ -19,6 +19,7 @@ type User struct {
 	Addresses []Address `json:"addresses,omitempty" bson:"-"`
 	Cards     []Card    `json:"cards,omitempty" bson:"-"`
 	UserID    string    `json:"id" bson:"-"`
+	Links     Links     `json:"_links"`
 }
 
 func New() User {
@@ -45,5 +46,17 @@ func (u *User) MaskCCs() {
 	for k, c := range u.Cards {
 		c.MaskCC()
 		u.Cards[k] = c
+	}
+}
+
+func (u *User) AddLinks() {
+	u.Links.AddCustomer(u.UserID)
+	for k, c := range u.Cards {
+		c.AddLinks()
+		u.Cards[k] = c
+	}
+	for k, a := range u.Addresses {
+		a.AddLinks()
+		u.Addresses[k] = a
 	}
 }

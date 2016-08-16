@@ -6,5 +6,10 @@ type Address struct {
 	Country  string `json:"country" bson:"country,omitempty"`
 	City     string `json:"city" bson:"city,omitempty"`
 	PostCode string `json:"postcode" bson:"postcode,omitempty"`
-	ID       string `bson:"-"`
+	ID       string `json:"-" bson:"-"`
+	Links    Links  `json:"_links"`
+}
+
+func (a *Address) AddLinks() {
+	a.Links.AddAddress(a.ID)
 }
