@@ -1,6 +1,7 @@
 FROM golang:1.6-wheezy
 ENV sourcesdir /go/src/github.com/microservices-demo/user/
 ENV MONGO_HOST localhost
+ENV HATEAOS user
 ENV USER_DATABASE mongodb
 
 COPY . ${sourcesdir}
@@ -11,7 +12,6 @@ RUN apt-get update
 RUN apt-get install -y mongodb-org
 RUN go get -v github.com/Masterminds/glide && cd ${sourcesdir} && glide install && go install
 RUN mkdir -p /data/db
-RUN mongod&
 RUN ${sourcesdir}scripts/mongo_create_insert.sh
 
 ENTRYPOINT ${sourcesdir}scripts/start.sh
