@@ -16,7 +16,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&domain, "link-domain", os.Getenv("HATEAOF"), "HATEAOF link domain")
+	flag.StringVar(&domain, "link-domain", os.Getenv("HATEAOS"), "HATEAOS link domain")
 }
 
 type Links map[string]Href
