@@ -14,13 +14,12 @@ import (
 )
 
 var (
-	name                string
-	password            string
-	host                string
-	db                  = "users"
-	ErrInvalidHexID     = errors.New("Invalid Id Hex")
-	ErrorSavingCardData = errors.New("There was a problem saving some card data")
-	ErrorSavingAddrData = errors.New("There was a problem saving some address data")
+	name     string
+	password string
+	host     string
+	db       = "users"
+	//ErrInvalidHexID represents a entity id that is not a valid bson ObjectID
+	ErrInvalidHexID = errors.New("Invalid Id Hex")
 )
 
 func init() {
@@ -29,10 +28,13 @@ func init() {
 	flag.StringVar(&host, "mongo-host", os.Getenv("MONGO_HOST"), "Mongo host")
 }
 
+// Mongo meets the Database interface requirements
 type Mongo struct {
+	//Session is a MongoDB Session
 	Session *mgo.Session
 }
 
+// Init MongoDB
 func (m *Mongo) Init() error {
 	u := getURL()
 	var err error
@@ -43,6 +45,7 @@ func (m *Mongo) Init() error {
 	return m.EnsureIndexes()
 }
 
+// MongoUser is a wrapper for the users
 type MongoUser struct {
 	users.User `bson:",inline"`
 	ID         bson.ObjectId   `bson:"_id"`
@@ -50,6 +53,7 @@ type MongoUser struct {
 	CardIDs    []bson.ObjectId `bson:"cards"`
 }
 
+// New Returns a new MongoUser
 func New() MongoUser {
 	u := users.New()
 	return MongoUser{
@@ -59,6 +63,7 @@ func New() MongoUser {
 	}
 }
 
+// AddUserIDs adds userID as string to user
 func (mu *MongoUser) AddUserIDs() {
 	if mu.User.Addresses == nil {
 		mu.User.Addresses = make([]users.Address, 0)
@@ -77,24 +82,29 @@ func (mu *MongoUser) AddUserIDs() {
 	mu.User.UserID = mu.ID.Hex()
 }
 
+// MongoAddress is a wrapper for Address
 type MongoAddress struct {
 	users.Address `bson:",inline"`
 	ID            bson.ObjectId `bson:"_id"`
 }
 
+// AddID ObjectID as string
 func (m *MongoAddress) AddID() {
 	m.Address.ID = m.ID.Hex()
 }
 
+// MongoCard is a wrapper for Card
 type MongoCard struct {
 	users.Card `bson:",inline"`
 	ID         bson.ObjectId `bson:"_id"`
 }
 
+// AddID ObjectID as string
 func (m *MongoCard) AddID() {
 	m.Card.ID = m.ID.Hex()
 }
 
+// CreateUser Insert user to MongoDB, including connected addresses and cards, update passed in user with Ids
 func (m *Mongo) CreateUser(u *users.User) error {
 	s := m.Session.Copy()
 	defer s.Close()
@@ -178,6 +188,7 @@ func (m *Mongo) appendAttributeId(attr string, id bson.ObjectId, userid string) 
 		bson.M{"$addToSet": bson.M{"addresses": id}})
 }
 
+// GetUserByName Get user by their name
 func (m *Mongo) GetUserByName(name string) (users.User, error) {
 	s := m.Session.Copy()
 	defer s.Close()
@@ -188,6 +199,7 @@ func (m *Mongo) GetUserByName(name string) (users.User, error) {
 	return mu.User, err
 }
 
+// GetUser Get user by their object id
 func (m *Mongo) GetUser(id string) (users.User, error) {
 	s := m.Session.Copy()
 	defer s.Close()
@@ -201,7 +213,9 @@ func (m *Mongo) GetUser(id string) (users.User, error) {
 	return mu.User, err
 }
 
+// GetUsers Get all users
 func (m *Mongo) GetUsers() ([]users.User, error) {
+	// TODO: add paginations
 	s := m.Session.Copy()
 	defer s.Close()
 	c := s.DB("").C("customers")
@@ -215,6 +229,7 @@ func (m *Mongo) GetUsers() ([]users.User, error) {
 	return us, err
 }
 
+// GetUserAttributes given a user, load all cards and addresses connected to that user
 func (m *Mongo) GetUserAttributes(u *users.User) error {
 	s := m.Session.Copy()
 	defer s.Close()
@@ -261,6 +276,7 @@ func (m *Mongo) GetUserAttributes(u *users.User) error {
 	return nil
 }
 
+// GetCard Gets card by objects Id
 func (m *Mongo) GetCard(id string) (users.Card, error) {
 	s := m.Session.Copy()
 	defer s.Close()
@@ -273,7 +289,10 @@ func (m *Mongo) GetCard(id string) (users.Card, error) {
 	mc.AddID()
 	return mc.Card, err
 }
+
+// GetCards Gets all cards
 func (m *Mongo) GetCards() ([]users.Card, error) {
+	// TODO: add pagination
 	s := m.Session.Copy()
 	defer s.Close()
 	c := s.DB("").C("cards")
@@ -286,6 +305,8 @@ func (m *Mongo) GetCards() ([]users.Card, error) {
 	}
 	return cs, err
 }
+
+// CreateCard adds card to MongoDB
 func (m *Mongo) CreateCard(ca *users.Card, userid string) error {
 	if !bson.IsObjectIdHex(userid) {
 		return errors.New("Invalid Id Hex")
@@ -311,6 +332,7 @@ func (m *Mongo) CreateCard(ca *users.Card, userid string) error {
 	return err
 }
 
+// GetAddress Gets an address by object Id
 func (m *Mongo) GetAddress(id string) (users.Address, error) {
 	s := m.Session.Copy()
 	defer s.Close()
@@ -324,7 +346,9 @@ func (m *Mongo) GetAddress(id string) (users.Address, error) {
 	return ma.Address, err
 }
 
+// GetAddresses gets all addresses
 func (m *Mongo) GetAddresses() ([]users.Address, error) {
+	// TODO: add pagination
 	s := m.Session.Copy()
 	defer s.Close()
 	c := s.DB("").C("addresses")
@@ -338,6 +362,7 @@ func (m *Mongo) GetAddresses() ([]users.Address, error) {
 	return as, err
 }
 
+// CreateAddress Inserts Address into MongoDB
 func (m *Mongo) CreateAddress(a *users.Address, userid string) error {
 	if !bson.IsObjectIdHex(userid) {
 		return errors.New("Invalid Id Hex")
@@ -376,6 +401,7 @@ func getURL() url.URL {
 	return ur
 }
 
+// EnsureIndexes ensures username is unique
 func (m *Mongo) EnsureIndexes() error {
 	s := m.Session.Copy()
 	defer s.Close()
