@@ -15,7 +15,6 @@ insert_customer({
     "addresses": [ObjectId("57a98d98e4b00679b4a830ad")],
     "cards": [ObjectId("57a98d98e4b00679b4a830ae")]
 });
-//pass test1
 insert_customer({
     "_id": ObjectId("57a98d98e4b00679b4a830b2"),
     "firstName": "User",
@@ -25,7 +24,6 @@ insert_customer({
     "addresses": [ObjectId("57a98d98e4b00679b4a830b0")],
     "cards": [ObjectId("57a98d98e4b00679b4a830b1")]
 });
-//pass test2
 insert_customer({
     "_id": ObjectId("57a98d98e4b00679b4a830b5"),
     "firstName": "User1",
@@ -35,7 +33,6 @@ insert_customer({
     "addresses": [ObjectId("57a98d98e4b00679b4a830b3")],
     "cards": [ObjectId("57a98d98e4b00679b4a830b4")]
 });
-//pass test3
-print("_______ADDRESS DATA_______");
+print("_______CUSTOMER DATA_______");
 db.customers.find().forEach(get_results);
-print("______END ADDRESS DATA_____");
+print("______END CUSTOMER DATA_____");

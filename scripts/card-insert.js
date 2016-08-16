@@ -31,8 +31,8 @@ insert_card({
     "ccv": "432"
 });
 
-print("________ADDRESS DATA_______");
+print("________CARD DATA_______");
 db.cards.find().forEach(get_results);
-print("______END ADDRESS DATA_____");
+print("______END CARD DATA_____");
 
 
