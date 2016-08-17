@@ -18,7 +18,7 @@ var (
 	ErrUnauthorized = errors.New("Unauthorized")
 )
 
-// Service is the login service, providing operations for users to login and register.
+// Service is the user service, providing operations for users to login, register, and retrieve customer information.
 type Service interface {
 	Login(username, password string) (users.User, error) // GET /login
 	// Only used for testing at the moment
