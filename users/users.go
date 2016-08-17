@@ -1,8 +1,12 @@
 package users
 
 import (
+	"crypto/sha1"
 	"errors"
 	"fmt"
+	"io"
+	"strconv"
+	"time"
 )
 
 var (
@@ -11,26 +15,61 @@ var (
 )
 
 type User struct {
-	FirstName string   `json:"firstName"`
-	LastName  string   `json:"lastName"`
-	Username  string   `json:"username"`
-	Password  string   `json:"password,omitempty"`
-	Addresses []string `json:"addresses,omitempty"`
-	Cards     []string `json:"cards,omitempty"`
+	FirstName string    `json:"firstName" bson:"firstName"`
+	LastName  string    `json:"lastName" bson:"lastName"`
+	Email     string    `json:"email" bson:"email"`
+	Username  string    `json:"username" bson:"username"`
+	Password  string    `json:"-" bson:"password,omitempty"`
+	Addresses []Address `json:"addresses,omitempty" bson:"-"`
+	Cards     []Card    `json:"cards,omitempty" bson:"-"`
+	UserID    string    `json:"id" bson:"-"`
+	Links     Links     `json:"_links"`
+	Salt      string    `json:"-" bson:"salt"`
 }
 
-func (c *User) Validate() error {
-	if c.FirstName == "" {
+func New() User {
+	u := User{Addresses: make([]Address, 0), Cards: make([]Card, 0)}
+	u.NewSalt()
+	return u
+}
+
+func (u *User) Validate() error {
+	if u.FirstName == "" {
 		return fmt.Errorf(ErrMissingField, "FirstName")
 	}
-	if c.LastName == "" {
+	if u.LastName == "" {
 		return fmt.Errorf(ErrMissingField, "LastName")
 	}
-	if c.Username == "" {
+	if u.Username == "" {
 		return fmt.Errorf(ErrMissingField, "Username")
 	}
-	if c.Password == "" {
+	if u.Password == "" {
 		return fmt.Errorf(ErrMissingField, "Password")
 	}
 	return nil
+}
+
+func (u *User) MaskCCs() {
+	for k, c := range u.Cards {
+		c.MaskCC()
+		u.Cards[k] = c
+	}
+}
+
+func (u *User) AddLinks() {
+	u.Links.AddCustomer(u.UserID)
+	for k, c := range u.Cards {
+		c.AddLinks()
+		u.Cards[k] = c
+	}
+	for k, a := range u.Addresses {
+		a.AddLinks()
+		u.Addresses[k] = a
+	}
+}
+
+func (u *User) NewSalt() {
+	h := sha1.New()
+	io.WriteString(h, strconv.Itoa(int(time.Now().UnixNano())))
+	u.Salt = fmt.Sprintf("%x", h.Sum(nil))
 }
