@@ -11,28 +11,34 @@ insert_customer({
     "firstName": "Eve",
     "lastName": "Berger",
     "username": "Eve_Berger",
-    "password": "b5040cba4bb01c0a9570d261fd031d6d67e384e2",
+    "password": "f0b6dab1610562b77078081c88c334f934dd85d6",
+    "salt": "c748112bc027878aa62812ba1ae00e40ad46d497",
     "addresses": [ObjectId("57a98d98e4b00679b4a830ad")],
     "cards": [ObjectId("57a98d98e4b00679b4a830ae")]
 });
+//pass test1
 insert_customer({
     "_id": ObjectId("57a98d98e4b00679b4a830b2"),
     "firstName": "User",
     "lastName": "Name",
     "username": "user",
-    "password": "d2769601c686ed2c4a16cccdb3c7104e1fe2a5ef",
+    "password": "737a21044f994ca25906702c27157ce3f7633f76",
+    "salt": "6c1c6176e8b455ef37da13d953df971c249d0d8e",
     "addresses": [ObjectId("57a98d98e4b00679b4a830b0")],
     "cards": [ObjectId("57a98d98e4b00679b4a830b1")]
 });
+//pass test2
 insert_customer({
     "_id": ObjectId("57a98d98e4b00679b4a830b5"),
     "firstName": "User1",
     "lastName": "Name1",
     "username": "user1",
-    "password": "5cd681c7e60178b4d566bdff96162475a53dd41a",
+    "password": "9ffa074f5129ee82ebc44b5229e5e9b9915fe519",
+    "salt": "bd832b0e10c6882deabc5e8e60a37689e2b708c2",
     "addresses": [ObjectId("57a98d98e4b00679b4a830b3")],
     "cards": [ObjectId("57a98d98e4b00679b4a830b4")]
 });
+//pass test3
 print("_______CUSTOMER DATA_______");
 db.customers.find().forEach(get_results);
 print("______END CUSTOMER DATA_____");
