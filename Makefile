@@ -42,6 +42,9 @@ dockerruntest: dockertestdb dockerdev
 docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
+dockertravis: build
+	docker build -t $(NAME) -t $(TRAVIS_COMMIT) -f Dockerfile-release .
+
 dockertest: dockerruntest
 	scripts/testcontainer.sh
 	docker stop my$(TESTDB) $(INSTANCE)-dev
