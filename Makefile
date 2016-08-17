@@ -45,8 +45,8 @@ docker: build
 dockertest: dockerruntest
 	scripts/testcontainer.sh
 	docker stop my$(TESTDB) $(INSTANCE)-dev
-	docker rm my$(TESTDB)
-	docker rm $(TESTDB)
+	-docker rm my$(TESTDB)
+	-docker rm $(TESTDB)
 
 clean: 
 	rm -rf bin
