@@ -9,15 +9,17 @@ To build a local testing version:
 
 
 ```bash
-docker build -t userservice .
+make dockerruntest
 
 ```
 
-To run
+To stop 
 
 ```bash
-docker run -p 8084:8084 -i -t userservice
+make clean
+
 ```
+
 Accessible at localhost:8084
 
 ##Endpoints
@@ -32,4 +34,4 @@ Accessible at localhost:8084
 /register
 
 
-Test user account passwords can be found in the comments in scripts/customer-insert.js
+Test user account passwords can be found in the comments in users-db-test/scripts/customer-insert.js

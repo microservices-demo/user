@@ -32,13 +32,17 @@ coverprofile:
 dockerdev:
 	docker build --no-cache -t $(INSTANCE)-dev .
 
+dockertestdb:
+	docker build -t $(TESTDB) -f users-db-test/Dockerfile --no-cache users-db-test/
+
+dockerruntest: dockertestdb dockerdev
+	docker run --name my$(TESTDB) -d -h my$(TESTDB) $(TESTDB)
+	docker run --name $(INSTANCE)-dev -d -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
+
 docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
-dockertest: dockerdev
-	docker build -t $(TESTDB) -f users-db-test/Dockerfile --no-cache users-db-test/
-	docker run --name my$(TESTDB) -d -h my$(TESTDB) $(TESTDB)
-	docker run --name $(INSTANCE)-dev -d -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
+dockertest: dockerruntest
 	scripts/testcontainer.sh
 	docker stop my$(TESTDB) $(INSTANCE)-dev
 	docker rm my$(TESTDB)
