@@ -1,8 +1,12 @@
 package users
 
 import (
+	"crypto/sha1"
 	"errors"
 	"fmt"
+	"io"
+	"strconv"
+	"time"
 )
 
 var (
@@ -20,10 +24,13 @@ type User struct {
 	Cards     []Card    `json:"cards,omitempty" bson:"-"`
 	UserID    string    `json:"id" bson:"-"`
 	Links     Links     `json:"_links"`
+	Salt      string    `json:"-" bson:"salt"`
 }
 
 func New() User {
-	return User{Addresses: make([]Address, 0), Cards: make([]Card, 0)}
+	u := User{Addresses: make([]Address, 0), Cards: make([]Card, 0)}
+	u.NewSalt()
+	return u
 }
 
 func (u *User) Validate() error {
@@ -59,4 +66,10 @@ func (u *User) AddLinks() {
 		a.AddLinks()
 		u.Addresses[k] = a
 	}
+}
+
+func (u *User) NewSalt() {
+	h := sha1.New()
+	io.WriteString(h, strconv.Itoa(int(time.Now().UnixNano())))
+	u.Salt = fmt.Sprintf("%x", h.Sum(nil))
 }

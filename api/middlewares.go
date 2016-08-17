@@ -25,8 +25,6 @@ type loggingMiddleware struct {
 	logger log.Logger
 }
 
-// TODO Remove passwords from Logging.
-
 func (mw loggingMiddleware) Login(username, password string) (user users.User, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log(

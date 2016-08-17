@@ -1,7 +1,7 @@
 package api
 
 // service.go contains the definition and implementation (business logic) of the
-// login service. Everything here is agnostic to the transport (HTTP).
+// user service. Everything here is agnostic to the transport (HTTP).
 
 import (
 	"crypto/sha1"
@@ -14,11 +14,10 @@ import (
 )
 
 var (
-	passwordSalt    = "passwordsalt"
 	ErrUnauthorized = errors.New("Unauthorized")
 )
 
-// Service is the login service, providing operations for users to login and register.
+// Service is the user service, providing operations for users to login, register, and retrieve customer information.
 type Service interface {
 	Login(username, password string) (users.User, error) // GET /login
 	// Only used for testing at the moment
@@ -43,7 +42,7 @@ func (s *fixedService) Login(username, password string) (users.User, error) {
 	if err != nil {
 		return users.New(), err
 	}
-	if u.Password != calculatePassHash(password) {
+	if u.Password != calculatePassHash(password, u.Salt) {
 		return users.New(), ErrUnauthorized
 	}
 	db.GetUserAttributes(&u)
@@ -55,7 +54,7 @@ func (s *fixedService) Login(username, password string) (users.User, error) {
 func (s *fixedService) Register(username, password, email string) bool {
 	u := users.New()
 	u.Username = username
-	u.Password = calculatePassHash(password)
+	u.Password = calculatePassHash(password, u.Salt)
 	u.Email = email
 	err := db.CreateUser(&u)
 	if err != nil {
@@ -129,9 +128,9 @@ func (s *fixedService) PostCard(card users.Card, userid string) bool {
 	return true
 }
 
-func calculatePassHash(pass string) string {
+func calculatePassHash(pass, salt string) string {
 	h := sha1.New()
-	io.WriteString(h, passwordSalt)
+	io.WriteString(h, salt)
 	io.WriteString(h, pass)
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
