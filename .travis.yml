@@ -17,4 +17,4 @@ after_success:
   - goveralls -coverprofile=cover.profile -service=travis-ci
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS;
   - make docker
-  - docker push weaveworksdemo/user:$TRAVIS_COMMIT
+  - docker push weaveworksdemos/user:$TRAVIS_COMMIT
