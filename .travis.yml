@@ -7,12 +7,14 @@ services:
 script:
   - make
 install:
-    - make deps
+  - make deps
 script:
-    - make test
-    - make coverprofile
-    - make dockertest
+  - make test
+  - make coverprofile
+  - make dockertest
 after_success:
-    - go get -v github.com/mattn/goveralls
-    - goveralls -coverprofile=cover.profile -service=travis-ci
-
+  - go get -v github.com/mattn/goveralls
+  - goveralls -coverprofile=cover.profile -service=travis-ci
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS;
+  - make docker
+  - docker push weaveworksdemo/user:$TRAVIS_COMMIT
