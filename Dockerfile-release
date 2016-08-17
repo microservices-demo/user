@@ -2,7 +2,6 @@ FROM busybox:1
 
 WORKDIR /
 EXPOSE 80
-COPY users.json /config/users.json
-COPY app /
+COPY bin/user /
 
-CMD ["/app", "-port=80", "-db]
+CMD ["/user", "-port=80"]
