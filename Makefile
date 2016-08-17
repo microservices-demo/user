@@ -6,8 +6,7 @@ default: build
 pre: 
 	go get -v github.com/Masterminds/glide
 
-deps:
-	pre
+deps: pre
 	glide install
 
 rm-deps:
