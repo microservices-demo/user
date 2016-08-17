@@ -14,7 +14,6 @@ import (
 )
 
 var (
-	passwordSalt    = "passwordsalt"
 	ErrUnauthorized = errors.New("Unauthorized")
 )
 
