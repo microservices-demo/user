@@ -1,6 +1,6 @@
 NAME = weaveworksdemos/user
 INSTANCE = user
-
+TESTDB = weaveworkstestuserdb
 default: build
 
 pre: 
@@ -30,17 +30,27 @@ coverprofile:
 
 
 dockerdev:
-	docker build -t $(NAME)-dev .
+	docker build --no-cache -t $(INSTANCE)-dev .
 
 docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
-rundev:
-	docker run --rm -p 8084:8084 $(NAME)-dev
+dockertest: dockerdev
+	docker build -t $(TESTDB) -f users-db-test/Dockerfile --no-cache users-db-test/
+	docker run --name my$(TESTDB) -d -h my$(TESTDB) $(TESTDB)
+	docker run --name $(INSTANCE)-dev -d -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
+	scripts/testcontainer.sh
+	docker stop my$(TESTDB) $(INSTANCE)-dev
+	docker rm my$(TESTDB)
+	docker rm $(TESTDB)
 
 clean: 
 	rm -rf bin
 	rm -rf vendor
+	-docker stop $(INSTANCE)-dev
+	-docker stop my$(TESTDB)
+	-docker rm my$(TESTDB)
+	-docker rm $(INSTANCE)-dev
 
 build: 
 	mkdir -p bin 
