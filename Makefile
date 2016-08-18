@@ -59,6 +59,11 @@ dockertest: dockerruntest
 	-docker rm my$(TESTDB)
 	-docker rm $(TESTDB)
 
+testapi:
+	-rm -rf /tmp/ms-demo
+	@git clone git@github.com:microservices-demo/microservices-demo.git /tmp/ms-demo
+	
+
 clean: 
 	rm -rf bin
 	rm -rf vendor
