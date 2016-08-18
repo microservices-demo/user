@@ -8,12 +8,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"golang.org/x/net/context"
+	corelog "log"
 
 	"github.com/go-kit/kit/log"
 	"github.com/microservices-demo/user/api"
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/db/mongodb"
+	"golang.org/x/net/context"
 )
 
 var dev bool
@@ -41,8 +42,7 @@ func main() {
 	}
 	err := db.Init()
 	if err != nil {
-		logger.Log(err)
-		os.Exit(1)
+		corelog.Fatal(err)
 	}
 
 	// Service domain.
