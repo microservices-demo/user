@@ -1,8 +1,14 @@
 NAME = weaveworksdemos/user
 INSTANCE = user
 TESTDB = weaveworkstestuserdb
-default: build
 
+ifeq ($(TRAVIS_BRANCH), master)
+	TAG=snapshot
+else
+	TAG=$(TRAVIS_COMMIT)
+endif
+
+default: build
 pre: 
 	go get -v github.com/Masterminds/glide
 
@@ -43,11 +49,6 @@ docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
 dockertravis: build
-	ifeq ($(TRAVIS_BRANCH), "master")
-		TAG="snapshot"
-	else
-		TAG=$(TRAVIS_COMMIT)
-	endif
 	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
 	docker build -t $(NAME):$(TAG) -f Dockerfile-release .
 	docker push $(NAME):$(TAG)
