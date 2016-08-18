@@ -40,9 +40,17 @@ func main() {
 		logger = log.NewContext(logger).With("ts", log.DefaultTimestampUTC)
 		logger = log.NewContext(logger).With("caller", log.DefaultCaller)
 	}
-	err := db.Init()
-	if err != nil {
-		corelog.Fatal(err)
+	dbconn := false
+	for !dbconn {
+		err := db.Init()
+		if err != nil {
+			if err == db.ErrNoDatabaseSelected {
+				corelog.Fatal(err)
+			}
+			corelog.Print(err)
+		} else {
+			dbconn = true
+		}
 	}
 
 	// Service domain.
