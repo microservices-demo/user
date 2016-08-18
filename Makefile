@@ -43,9 +43,14 @@ docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
 dockertravis: build
+	ifeq ($(TRAVIS_BRANCH), "master")
+		TAG="snapshot"
+	else
+		TAG=$(TRAVIS_COMMIT)
+	endif
 	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
-	docker build -t $(NAME):$(TRAVIS_COMMIT) -f Dockerfile-release .
-	docker push $(NAME):$(TRAVIS_COMMIT)
+	docker build -t $(NAME):$(TAG) -f Dockerfile-release .
+	docker push $(NAME):$(TAG)
 
 dockertest: dockerruntest
 	scripts/testcontainer.sh
