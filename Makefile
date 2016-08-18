@@ -43,7 +43,7 @@ docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
 dockertravis: build
-	docker login -e $(DOCKER_EMAIL) -u $(DOCKER_USER) -p $(DOCKER_PASS)
+	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
 	docker build -t $(NAME):$(TRAVIS_COMMIT) -f Dockerfile-release .
 	docker push $(NAME):$(TRAVIS_COMMIT)
 
