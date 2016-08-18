@@ -39,8 +39,8 @@ func TestSet(t *testing.T) {
 	if err == nil {
 		t.Error("Expecting error for no databade found")
 	}
-	Register("test2", TestDB)
-	database = "test2"
+	Register("nodb2", TestDB)
+	database = "nodb2"
 	err = Set()
 	if err != nil {
 		t.Error(err)
