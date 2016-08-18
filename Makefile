@@ -43,7 +43,7 @@ docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
 dockertravis: build
-	docker build -t $(NAME) -t $(TRAVIS_COMMIT) -f Dockerfile-release .
+	docker build -t $(NAME):$(TRAVIS_COMMIT) -f Dockerfile-release .
 
 dockertest: dockerruntest
 	scripts/testcontainer.sh
