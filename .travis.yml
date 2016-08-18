@@ -15,6 +15,4 @@ script:
 after_success:
   - go get -v github.com/mattn/goveralls
   - goveralls -coverprofile=cover.profile -service=travis-ci
-  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS;
   - make dockertravis
-  - docker push weaveworksdemos/user:$TRAVIS_COMMIT
