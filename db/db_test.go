@@ -33,6 +33,20 @@ func TestInit(t *testing.T) {
 	}
 }
 
+func TestSet(t *testing.T) {
+	database = "nodb"
+	err := Set()
+	if err == nil {
+		t.Error("Expecting error for no databade found")
+	}
+	Register("test2", TestDB)
+	database = "test2"
+	err = Set()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestRegister(t *testing.T) {
 	l := len(DBTypes)
 	Register("test2", TestDB)
