@@ -15,8 +15,6 @@ class Dredd:
                    Dredd.image,
                    "/tmp/specs/{0}.json".format(service),
                    api_endpoint,
-                   "-f",
-                   "/tmps/specs/hooks.js"
                    ]
         out = Docker().execute(command)
         Docker().kill_and_remove(self.container_name)
