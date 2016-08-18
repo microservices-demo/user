@@ -43,6 +43,7 @@ dockertestdb:
 
 dockerruntest: dockertestdb dockerdev
 	docker run --name my$(TESTDB) -d -h my$(TESTDB) $(TESTDB)
+	sleep 2
 	docker run --name $(INSTANCE)-dev -d -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
 
 docker: build
