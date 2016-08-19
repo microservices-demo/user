@@ -62,7 +62,8 @@ dockertest: dockerruntest
 testapi:
 	-rm -rf /tmp/ms-demo
 	@git clone git@github.com:microservices-demo/microservices-demo.git /tmp/ms-demo
-	
+	export PYTHONPATH=\$(PYTHONPATH):\$(PWD)/test
+	@python test/container.py --service=$(INSTANCE) --serviceup=customers
 
 clean: 
 	rm -rf bin
