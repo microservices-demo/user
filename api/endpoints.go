@@ -138,7 +138,7 @@ type userResponse struct {
 }
 
 type usersResponse struct {
-	Users []users.User `json:"users"`
+	Users []users.User `json:"customer"`
 }
 
 type addressPostRequest struct {
@@ -147,7 +147,7 @@ type addressPostRequest struct {
 }
 
 type addressesResponse struct {
-	Addresses []users.Address `json:"addresses"`
+	Addresses []users.Address `json:"address"`
 }
 
 type cardPostRequest struct {
@@ -156,7 +156,7 @@ type cardPostRequest struct {
 }
 
 type cardsResponse struct {
-	Cards []users.Card `json:"cards"`
+	Cards []users.Card `json:"card"`
 }
 
 type registerRequest struct {
