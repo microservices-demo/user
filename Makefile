@@ -60,17 +60,17 @@ dockertest: dockerruntest
 		weaveworksdemos/openapi /tmp/specs/$(INSTANCE).json\
 		http://$(INSTANCE)-dev:8084/\
 		-f /tmp/specs/hooks.js
-	 $(MAKE) clean
+	 $(MAKE) cleandocker
 
-testapi: dockerruntest testapirunning
-
-clean: 
-	rm -rf bin
-	rm -rf vendor
+cleandocker:
 	-docker stop $(INSTANCE)-dev
 	-docker stop my$(TESTDB)
 	-docker rm my$(TESTDB)
 	-docker rm $(INSTANCE)-dev
+
+clean: cleandocker 
+	rm -rf bin
+	rm -rf vendor
 
 build: 
 	mkdir -p bin 
