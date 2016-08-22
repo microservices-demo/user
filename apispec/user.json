@@ -396,8 +396,6 @@
                "required":[  
                   "self",
                   "customer",
-                  "addresses",
-                  "cards"
                ]
             }
          },
