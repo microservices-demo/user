@@ -1,4 +1,5 @@
 NAME = weaveworksdemos/user
+DBNAME = weaveworksdemos/user-db
 INSTANCE = user
 TESTDB = weaveworkstestuserdb
 OPENAPI = $(INSTANCE)-testopenapi
