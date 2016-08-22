@@ -49,7 +49,7 @@ dockerruntest: dockertestdb dockerdev
 docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
-dockertravisibuild: build
+dockertravisbuild: build
 	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
 	docker build -t $(NAME):$(TAG) -f Dockerfile-release .
 	docker push $(NAME):$(TAG)
