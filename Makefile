@@ -2,6 +2,7 @@ NAME = weaveworksdemos/user
 INSTANCE = user
 TESTDB = weaveworkstestuserdb
 OPENAPI = $(INSTANCE)-testopenapi
+GROUP = weaveworksdemos
 
 ifeq ($(TRAVIS_BRANCH), master)
 	TAG=snapshot
@@ -40,19 +41,19 @@ dockerdev:
 	docker build -t $(INSTANCE)-dev .
 
 dockertestdb:
-	docker build -t $(TESTDB) -f users-db-test/Dockerfile users-db-test/
+	docker build -t $(TESTDB) -f docker/user-db/Dockerfile docker/user-db/
 
 dockerruntest: dockertestdb dockerdev
 	docker run -d --name my$(TESTDB) -h my$(TESTDB) $(TESTDB)
 	docker run -d --name $(INSTANCE)-dev -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
 
 docker: build
-	docker build -t $(NAME) -f Dockerfile-release .
+	cp -rf bin docker/user/
+	docker build -t $(NAME) -f docker/user/Dockerfile-release docker/user/
 
 dockertravisbuild: build
 	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
-	docker build -t $(NAME):$(TAG) -f Dockerfile-release .
-	docker push $(NAME):$(TAG)
+	scripts/push.sh
 
 dockertest: dockerruntest
 	scripts/testcontainer.sh
@@ -70,6 +71,7 @@ cleandocker:
 
 clean: cleandocker 
 	rm -rf bin
+	rm -rf docker/user/bin
 	rm -rf vendor
 
 build: 
