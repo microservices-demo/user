@@ -11,7 +11,7 @@ class Dredd:
                    '-h', 'openapi',
                    '--name', self.container_name,
                    '--link', service_container,
-                   '-v', "{0}:{1}".format("/tmp/ms-demo/openapi/specs/{0}s/".format(service), "/tmp/specs/"),
+                   '-v', "{0}:{1}".format("apispec/{0}/".format(service), "/tmp/specs/"),
                    Dredd.image,
                    "/tmp/specs/{0}.json".format(service),
                    api_endpoint,

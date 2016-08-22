@@ -60,9 +60,9 @@ dockertest: dockerruntest
 	-docker rm $(TESTDB)
 
 testapi: dockerruntest
-	-rm -rf /tmp/ms-demo
 	export PYTHONPATH=\$(PYTHONPATH):\$(PWD)/test
 	@python test/container.py --service=$(INSTANCE) --serviceup=customers
+	docker run -h openapi --name openapi-tgfuz --link user-dev -v $(PWD)/apispec/:/tmp/specs/ weaveworksdemos/openapi /tmp/specs/user.json http://user-dev:8084/ -f /tmp/specs/hooks.js
 
 clean: 
 	rm -rf bin
