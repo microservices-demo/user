@@ -52,6 +52,9 @@ docker: build
 	docker build -t $(NAME) -f docker/user/Dockerfile-release docker/user/
 
 dockertravisbuild: build
+	cp -rf bin docker/user/
+	docker build -t $(NAME):$(TAG) -f docker/user/Dockerfile-release docker/user/
+	docker build -t $(DBNAME):$(TAG) -f docker/user-db/Dockerfile docker/user-db/
 	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
 	scripts/push.sh
 
