@@ -117,6 +117,7 @@ func (s *fixedService) GetCards(id string) ([]users.Card, error) {
 		return cs, err
 	}
 	c, err := db.GetCard(id)
+	c.AddLinks()
 	return []users.Card{c}, err
 }
 

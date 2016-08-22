@@ -36,10 +36,10 @@ coverprofile:
 
 
 dockerdev:
-	docker build --no-cache -t $(INSTANCE)-dev .
+	docker build -t $(INSTANCE)-dev --no-cache .
 
 dockertestdb:
-	docker build -t $(TESTDB) -f users-db-test/Dockerfile --no-cache users-db-test/
+	docker build -t $(TESTDB) -f users-db-test/Dockerfile users-db-test/
 
 dockerruntest: dockertestdb dockerdev
 	docker run --name my$(TESTDB) -d -h my$(TESTDB) $(TESTDB)
@@ -59,9 +59,8 @@ dockertest: dockerruntest
 	-docker rm my$(TESTDB)
 	-docker rm $(TESTDB)
 
-testapi:
+testapi: dockerruntest
 	-rm -rf /tmp/ms-demo
-	@git clone git@github.com:microservices-demo/microservices-demo.git /tmp/ms-demo
 	export PYTHONPATH=\$(PYTHONPATH):\$(PWD)/test
 	@python test/container.py --service=$(INSTANCE) --serviceup=customers
 
