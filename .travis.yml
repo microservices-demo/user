@@ -1,6 +1,8 @@
 language: go
 go: 1.6
 sudo: required
+env:
+  - GROUP=weaveworksdemos COMMIT=$TRAVIS_COMMIT TAG=$TRAVIS_TAG
 services:
   - docker
   - mongodb
