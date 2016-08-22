@@ -9,19 +9,25 @@ from util.Docker import Docker
 from time import sleep
 
 class ContainerTest(unittest.TestCase):
-    container_name = '{0}-dev'.format(SERVICE)
+    SERVICE = ""
+    SERVICEUP = ""
     TAG = "latest"
+     
     def __init__(self, methodName='runTest'):
+        super(ContainerTest, self).__init__(methodName)
+        self.ip = ""
+        self.container_name = ""
 
     def setUp(self):
-        self.ip = Docker().get_container_ip(UserContainerTest.container_name)
+    	self.container_name = '{0}-dev'.format(self.SERVICE)
+        self.ip = Docker().get_container_ip(self.container_name)
 
     def test_api_validated(self):
-        self.wait_or_fail('http://'+ self.ip +':8084/{0}'.format(SERVICEUP))
-        out = Dredd().test_against_endpoint(SERVICE, self.container_name, "http://{0}/".format(SERVICE))
+        self.wait_or_fail('http://'+ self.ip +':8084/{0}'.format(self.SERVICEUP))
+        out = Dredd().test_against_endpoint(self.SERVICE, self.container_name, "http://{0}:8084/".format(self.container_name))
+        print(out)
         self.assertGreater(out.find("0 failing"), -1)
         self.assertGreater(out.find("0 errors"), -1)
-        print(out)
 
     def wait_or_fail(self,endpoint, limit=20):
         while Api().noResponse(endpoint):

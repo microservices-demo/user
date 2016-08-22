@@ -28,10 +28,10 @@ class Docker:
         if p.wait() != 0:
             p.stdout.close()
             p.stderr.close()
-            raise RuntimeError(str(stderr, 'utf-8'))
+            raise RuntimeError(str(stderr))
         p.stdout.close()
         p.stderr.close()
-        return str(out, 'utf-8')
+        return str(out)
 
     def start_container(self, container_name="", image="", cmd="", host="", env=[]):
         command = ['docker', 'run', '-d']
