@@ -81,6 +81,26 @@ func TestAddUserIDs(t *testing.T) {
 	}
 }
 
+func TestAddressAddId(t *testing.T) {
+	m := MongoAddress{Address: users.Address{}}
+	id := bson.NewObjectId()
+	m.ID = id
+	m.AddID()
+	if m.Address.ID != id.Hex() {
+		t.Error("Expected matching Address Hex")
+	}
+}
+
+func TestCardAddId(t *testing.T) {
+	m := MongoCard{Card: users.Card{}}
+	id := bson.NewObjectId()
+	m.ID = id
+	m.AddID()
+	if m.Card.ID != id.Hex() {
+		t.Error("Expected matching Card Hex")
+	}
+}
+
 func TestCreate(t *testing.T) {
 	TestMongo.Session = TestServer.Session()
 	defer TestMongo.Session.Close()

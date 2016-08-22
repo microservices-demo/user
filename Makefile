@@ -1,6 +1,7 @@
 NAME = weaveworksdemos/user
 INSTANCE = user
 TESTDB = weaveworkstestuserdb
+OPENAPI = $(INSTANCE)-testopenapi
 
 ifeq ($(TRAVIS_BRANCH), master)
 	TAG=snapshot
@@ -36,36 +37,40 @@ coverprofile:
 
 
 dockerdev:
-	docker build --no-cache -t $(INSTANCE)-dev .
+	docker build -t $(INSTANCE)-dev .
 
 dockertestdb:
-	docker build -t $(TESTDB) -f users-db-test/Dockerfile --no-cache users-db-test/
+	docker build -t $(TESTDB) -f users-db-test/Dockerfile users-db-test/
 
 dockerruntest: dockertestdb dockerdev
-	docker run --name my$(TESTDB) -d -h my$(TESTDB) $(TESTDB)
-	docker run --name $(INSTANCE)-dev -d -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
+	docker run -d --name my$(TESTDB) -h my$(TESTDB) $(TESTDB)
+	docker run -d --name $(INSTANCE)-dev -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
 
 docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
-dockertravis: build
+dockertravisbuild: build
 	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
 	docker build -t $(NAME):$(TAG) -f Dockerfile-release .
 	docker push $(NAME):$(TAG)
 
 dockertest: dockerruntest
 	scripts/testcontainer.sh
-	docker stop my$(TESTDB) $(INSTANCE)-dev
-	-docker rm my$(TESTDB)
-	-docker rm $(TESTDB)
+	docker run -h openapi --rm --name $(OPENAPI) --link user-dev -v $(PWD)/apispec/:/tmp/specs/\
+		weaveworksdemos/openapi /tmp/specs/$(INSTANCE).json\
+		http://$(INSTANCE)-dev:8084/\
+		-f /tmp/specs/hooks.js
+	 $(MAKE) cleandocker
 
-clean: 
-	rm -rf bin
-	rm -rf vendor
+cleandocker:
 	-docker stop $(INSTANCE)-dev
 	-docker stop my$(TESTDB)
 	-docker rm my$(TESTDB)
 	-docker rm $(INSTANCE)-dev
+
+clean: cleandocker 
+	rm -rf bin
+	rm -rf vendor
 
 build: 
 	mkdir -p bin 
