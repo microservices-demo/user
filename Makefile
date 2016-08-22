@@ -1,6 +1,7 @@
 NAME = weaveworksdemos/user
 INSTANCE = user
 TESTDB = weaveworkstestuserdb
+OPENAPI = $(INSTANCE)-testopenapi
 
 ifeq ($(TRAVIS_BRANCH), master)
 	TAG=snapshot
@@ -36,7 +37,7 @@ coverprofile:
 
 
 dockerdev:
-	docker build -t $(INSTANCE)-dev --no-cache .
+	docker build -t $(INSTANCE)-dev .
 
 dockertestdb:
 	docker build -t $(TESTDB) -f users-db-test/Dockerfile users-db-test/
@@ -48,29 +49,29 @@ dockerruntest: dockertestdb dockerdev
 docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
 
-dockertravis: build
+dockertravisibuild: build
 	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
 	docker build -t $(NAME):$(TAG) -f Dockerfile-release .
 	docker push $(NAME):$(TAG)
 
 dockertest: dockerruntest
 	scripts/testcontainer.sh
-	docker stop my$(TESTDB) $(INSTANCE)-dev
-	-docker rm my$(TESTDB)
-	-docker rm $(TESTDB)
+	docker run -h openapi --name $(OPENAPI) --link user-dev -v $(PWD)/apispec/:/tmp/specs/\
+		weaveworksdemos/openapi /tmp/specs/$(INSTANCE).json\
+		http://$(INSTANCE)-dev:8084/\
+		-f /tmp/specs/hooks.js
 
-testapi: dockerruntest
-	export PYTHONPATH=\$(PYTHONPATH):\$(PWD)/test
-	@python test/container.py --service=$(INSTANCE) --serviceup=customers
-	docker run -h openapi --name openapi-tgfuz --link user-dev -v $(PWD)/apispec/:/tmp/specs/ weaveworksdemos/openapi /tmp/specs/user.json http://user-dev:8084/ -f /tmp/specs/hooks.js
+testapi: dockerruntest testapirunning
 
 clean: 
 	rm -rf bin
 	rm -rf vendor
 	-docker stop $(INSTANCE)-dev
+	-docker stop $(OPENAPI)
 	-docker stop my$(TESTDB)
 	-docker rm my$(TESTDB)
 	-docker rm $(INSTANCE)-dev
+	-docker rm $(OPENAPI)
 
 build: 
 	mkdir -p bin 
