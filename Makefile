@@ -43,8 +43,8 @@ dockertestdb:
 	docker build -t $(TESTDB) -f users-db-test/Dockerfile users-db-test/
 
 dockerruntest: dockertestdb dockerdev
-	docker run --name my$(TESTDB) -d -h my$(TESTDB) $(TESTDB)
-	docker run --name $(INSTANCE)-dev -d -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
+	docker run -d --name my$(TESTDB) -h my$(TESTDB) $(TESTDB)
+	docker run -d --name $(INSTANCE)-dev -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
 
 docker: build
 	docker build -t $(NAME) -f Dockerfile-release .
@@ -56,10 +56,11 @@ dockertravisbuild: build
 
 dockertest: dockerruntest
 	scripts/testcontainer.sh
-	docker run -h openapi --name $(OPENAPI) --link user-dev -v $(PWD)/apispec/:/tmp/specs/\
+	docker run -h openapi --rm --name $(OPENAPI) --link user-dev -v $(PWD)/apispec/:/tmp/specs/\
 		weaveworksdemos/openapi /tmp/specs/$(INSTANCE).json\
 		http://$(INSTANCE)-dev:8084/\
 		-f /tmp/specs/hooks.js
+	 $(MAKE) clean
 
 testapi: dockerruntest testapirunning
 
@@ -67,11 +68,9 @@ clean:
 	rm -rf bin
 	rm -rf vendor
 	-docker stop $(INSTANCE)-dev
-	-docker stop $(OPENAPI)
 	-docker stop my$(TESTDB)
 	-docker rm my$(TESTDB)
 	-docker rm $(INSTANCE)-dev
-	-docker rm $(OPENAPI)
 
 build: 
 	mkdir -p bin 
