@@ -42,6 +42,21 @@ func (l *Links) AddCard(id string) {
 	l.AddLink("card", id)
 }
 
+func (l *Links) AddAttrLink(attr string, id string) {
+	link := fmt.Sprintf("http://%v/%v/%v", domain, entitymap[attr], id)
+	nl := *l
+	nl[attr] = Href{link}
+	*l = nl
+}
+
+func (l *Links) AddAttrAddress(id string) {
+	l.AddAttrLink("address", id)
+}
+
+func (l *Links) AddAttrCard(id string) {
+	l.AddAttrLink("card", id)
+}
+
 type Href struct {
 	string `json:"href"`
 }
