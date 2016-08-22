@@ -45,7 +45,7 @@ func (l *Links) AddCard(id string) {
 func (l *Links) AddAttrLink(attr string, id string) {
 	link := fmt.Sprintf("http://%v/%v/%v", domain, entitymap[attr], id)
 	nl := *l
-	nl[attr] = Href{link}
+	nl[entitymap[attr]] = Href{link}
 	*l = nl
 }
 
