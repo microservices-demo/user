@@ -5,13 +5,11 @@ TESTDB = weaveworkstestuserdb
 OPENAPI = $(INSTANCE)-testopenapi
 GROUP = weaveworksdemos
 
-ifeq ($(TRAVIS_BRANCH), master)
-	TAG=snapshot
-else
-	TAG=$(TRAVIS_COMMIT)
-endif
+TAG=$(TRAVIS_COMMIT)
 
 default: build
+
+
 pre: 
 	go get -v github.com/Masterminds/glide
 
