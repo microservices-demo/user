@@ -1,5 +1,12 @@
 const hooks = require('hooks');
 
+hooks.beforeEach(function(transaction, done) {
+    if (process.env.DREDD_PROXY_ORIG_URL) {
+        transaction.fullPath = process.env.DREDD_PROXY_ORIG_URL + transaction.fullPath;
+    }
+    done();
+})
+
 hooks.before("/login > GET", function(transaction, done) {
     transaction.skip = true;
     done();
@@ -9,7 +16,7 @@ hooks.before("/register > POST", function(transaction, done) {
     transaction.request.headers['Content-Type'] = 'application/json';
     transaction.request.body = JSON.stringify(
 	{
-	    "username":"testuser",
+	    "username": "testuser",
 	    "password": "testpassword"
 	}
     );
