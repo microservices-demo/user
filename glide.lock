@@ -1,0 +1,35 @@
+hash: 207174d144994ec9ad587fb6da88600ef359b20dafd1c6d09a0fff8a390580be
+updated: 2016-08-19T15:03:39.098547184+02:00
+imports:
+- name: github.com/go-kit/kit
+  version: edff0d756347998686da440aaa8f517970cebac6
+  subpackages:
+  - endpoint
+  - log
+  - transport/http
+- name: github.com/go-logfmt/logfmt
+  version: d4327190ff838312623b09bfeb50d7c93c8d9c1d
+- name: github.com/go-stack/stack
+  version: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: cf79e51a62d8219d52060dfc1b4e810414ba2d15
+- name: github.com/kr/logfmt
+  version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
+- name: golang.org/x/net
+  version: 07b51741c1d6423d4a6abab1c49940ec09cb1aaf
+  subpackages:
+  - context
+  - context/ctxhttp
+- name: gopkg.in/mgo.v2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+  subpackages:
+  - bson
+  - dbtest
+  - internal/sasl
+  - internal/scram
+  - internal/json
+- name: gopkg.in/tomb.v2
+  version: 14b3d72120e8d10ea6e6b7f87f7175734b1faab8
+testImports: []
