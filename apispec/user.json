@@ -302,7 +302,7 @@
             "_embedded":{  
                "type":"object",
                "properties":{  
-                  "cards":{  
+                  "card":{  
                      "type":"array",
                      "items":{  
                         "$ref":"#/definitions/Card"
@@ -396,8 +396,6 @@
                "required":[  
                   "self",
                   "customer",
-                  "addresses",
-                  "cards"
                ]
             }
          },
@@ -525,7 +523,7 @@
             "_embedded":{  
                "type":"object",
                "properties":{  
-                  "addresses":{  
+                  "address":{  
                      "type":"array",
                      "items":{  
                         "$ref":"#/definitions/Address"
