@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/users"
 	"golang.org/x/net/context"
 )
@@ -63,8 +64,28 @@ func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetRequest)
-		users, err := s.GetUsers(req.ID)
-		return usersResponse{Users: users}, err
+		usrs, err := s.GetUsers(req.ID)
+		if req.ID == "" {
+			return EmbedStruct{usersResponse{Users: usrs}}, err
+		}
+		if len(usrs) == 0 {
+			if req.Attr == "addresses" {
+				return EmbedStruct{addressesResponse{Addresses: make([]users.Address, 0)}}, err
+			}
+			if req.Attr == "cards" {
+				return EmbedStruct{cardsResponse{Cards: make([]users.Card, 0)}}, err
+			}
+			return users.User{}, err
+		}
+		user := usrs[0]
+		db.GetUserAttributes(&user)
+		if req.Attr == "addresses" {
+			return EmbedStruct{addressesResponse{Addresses: user.Addresses}}, err
+		}
+		if req.Attr == "cards" {
+			return EmbedStruct{cardsResponse{Cards: user.Cards}}, err
+		}
+		return user, err
 	}
 }
 
@@ -82,7 +103,13 @@ func MakeAddressGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetRequest)
 		adds, err := s.GetAddresses(req.ID)
-		return addressesResponse{Addresses: adds}, err
+		if req.ID == "" {
+			return EmbedStruct{addressesResponse{Addresses: adds}}, err
+		}
+		if len(adds) == 0 {
+			return users.Address{}, err
+		}
+		return adds[0], err
 	}
 }
 
@@ -100,7 +127,13 @@ func MakeCardGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetRequest)
 		cards, err := s.GetCards(req.ID)
-		return cardsResponse{Cards: cards}, err
+		if req.ID == "" {
+			return EmbedStruct{cardsResponse{Cards: cards}}, err
+		}
+		if len(cards) == 0 {
+			return users.Card{}, err
+		}
+		return cards[0], err
 	}
 }
 
@@ -121,7 +154,8 @@ func MakeHealthEndpoint(s Service) endpoint.Endpoint {
 }
 
 type GetRequest struct {
-	ID string
+	ID   string
+	Attr string
 }
 
 type loginRequest struct {
@@ -176,4 +210,8 @@ type healthRequest struct {
 type healthResponse struct {
 	Status string `json:"status"`
 	Time   string `json:"time"`
+}
+
+type EmbedStruct struct {
+	Embed interface{} `json:"_embedded"`
 }

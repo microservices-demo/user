@@ -76,22 +76,44 @@ func CreateUser(u *users.User) error {
 
 //GetUserByName invokes DefaultDb method
 func GetUserByName(n string) (users.User, error) {
-	return DefaultDb.GetUserByName(n)
+	u, err := DefaultDb.GetUserByName(n)
+	if err == nil {
+		u.AddLinks()
+	}
+	return u, err
 }
 
 //GetUser invokes DefaultDb method
 func GetUser(n string) (users.User, error) {
-	return DefaultDb.GetUser(n)
+	u, err := DefaultDb.GetUser(n)
+	if err == nil {
+		u.AddLinks()
+	}
+	return u, err
 }
 
 //GetUsers invokes DefaultDb method
 func GetUsers() ([]users.User, error) {
-	return DefaultDb.GetUsers()
+	us, err := DefaultDb.GetUsers()
+	for k, _ := range us {
+		us[k].AddLinks()
+	}
+	return us, err
 }
 
 //GetUserAttributes invokes DefaultDb method
 func GetUserAttributes(u *users.User) error {
-	return DefaultDb.GetUserAttributes(u)
+	err := DefaultDb.GetUserAttributes(u)
+	if err != nil {
+		return err
+	}
+	for k, _ := range u.Addresses {
+		u.Addresses[k].AddLinks()
+	}
+	for k, _ := range u.Cards {
+		u.Cards[k].AddLinks()
+	}
+	return nil
 }
 
 //CreateAddress invokes DefaultDb method
@@ -101,12 +123,20 @@ func CreateAddress(a *users.Address, userid string) error {
 
 //GetAddress invokes DefaultDb method
 func GetAddress(n string) (users.Address, error) {
-	return DefaultDb.GetAddress(n)
+	a, err := DefaultDb.GetAddress(n)
+	if err == nil {
+		a.AddLinks()
+	}
+	return a, err
 }
 
 //GetAddresses invokes DefaultDb method
 func GetAddresses() ([]users.Address, error) {
-	return DefaultDb.GetAddresses()
+	as, err := DefaultDb.GetAddresses()
+	for k, _ := range as {
+		as[k].AddLinks()
+	}
+	return as, err
 }
 
 //CreateCard invokes DefaultDb method
@@ -121,5 +151,9 @@ func GetCard(n string) (users.Card, error) {
 
 //GetCards invokes DefaultDb method
 func GetCards() ([]users.Card, error) {
-	return DefaultDb.GetCards()
+	cs, err := DefaultDb.GetCards()
+	for k, _ := range cs {
+		cs[k].AddLinks()
+	}
+	return cs, err
 }
