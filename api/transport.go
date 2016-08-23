@@ -103,7 +103,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		code = http.StatusUnauthorized
 	}
 	w.WriteHeader(code)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", "application/hal+json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"error":       err.Error(),
 		"status_code": code,
@@ -184,13 +184,13 @@ func encodeHealthResponse(ctx context.Context, w http.ResponseWriter, response i
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	// All of our response objects are JSON serializable, so we just do that.
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", "application/hal+json")
 	return json.NewEncoder(w).Encode(response)
 }
 
 func encodeEmbedResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	// All of our response objects are JSON serializable, so we just do that.
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", "application/hal+json")
 	er := EmbedStruct{Embed: response}
 	return json.NewEncoder(w).Encode(er)
 }
