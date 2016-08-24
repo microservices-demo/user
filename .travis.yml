@@ -19,3 +19,15 @@ after_success:
 before_install:
 - openssl aes-256-cbc -K $encrypted_7c540e2aa1cb_key -iv $encrypted_7c540e2aa1cb_iv
   -in user_deploy_rsa.enc -out ~\/user_deploy_rsa -d
+addons:
+  ssh_known_hosts: $BASTION
+before_deploy:
+  - eval "$(ssh-agent -s)"
+  - chmod 600 $TRAVIS_BUILD_DIR/deploy_rsa
+  - ssh-add $TRAVIS_BUILD_DIR/deploy_rsa
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: ssh -o StrictHostKeyChecking=no ${BASTION_USER}@${BASTION} ./deploy.sh accounts $COMMIT
+  on:
+    branch: master
