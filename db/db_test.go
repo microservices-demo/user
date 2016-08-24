@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/microservices-demo/user/users"
 )
 
@@ -90,7 +89,6 @@ func TestGetUserAttributes(t *testing.T) {
 		t.Error("expected one address added for GetUserAttributes")
 	}
 	if !reflect.DeepEqual(u.Addresses[0], TestAddress) {
-		spew.Dump(u.Addresses[0])
 		t.Error("expected matching addresses")
 	}
 }
