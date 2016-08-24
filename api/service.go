@@ -31,21 +31,23 @@ type Service interface {
 }
 
 // NewFixedService returns a simple implementation of the Service interface,
-func NewFixedService() Service {
-	return &fixedService{}
+func NewFixedService(db db.Database) Service {
+	return &fixedService{db}
 }
 
-type fixedService struct{}
+type fixedService struct {
+	Database db.Database
+}
 
 func (s *fixedService) Login(username, password string) (users.User, error) {
-	u, err := db.GetUserByName(username)
+	u, err := s.Database.GetUserByName(username)
 	if err != nil {
 		return users.New(), err
 	}
 	if u.Password != calculatePassHash(password, u.Salt) {
 		return users.New(), ErrUnauthorized
 	}
-	db.GetUserAttributes(&u)
+	s.Database.GetUserAttributes(&u)
 	u.MaskCCs()
 	return u, nil
 
@@ -56,7 +58,7 @@ func (s *fixedService) Register(username, password, email string) bool {
 	u.Username = username
 	u.Password = calculatePassHash(password, u.Salt)
 	u.Email = email
-	err := db.CreateUser(&u)
+	err := s.Database.CreateUser(&u)
 	if err != nil {
 		return false
 	}
@@ -65,20 +67,20 @@ func (s *fixedService) Register(username, password, email string) bool {
 
 func (s *fixedService) GetUsers(id string) ([]users.User, error) {
 	if id == "" {
-		us, err := db.GetUsers()
+		us, err := s.Database.GetUsers()
 		for k, u := range us {
 			u.AddLinks()
 			us[k] = u
 		}
 		return us, err
 	}
-	u, err := db.GetUser(id)
+	u, err := s.Database.GetUser(id)
 	u.AddLinks()
 	return []users.User{u}, err
 }
 
 func (s *fixedService) PostUser(user users.User) bool {
-	err := db.CreateUser(&user)
+	err := s.Database.CreateUser(&user)
 	if err != nil {
 		return false
 	}
@@ -87,20 +89,20 @@ func (s *fixedService) PostUser(user users.User) bool {
 
 func (s *fixedService) GetAddresses(id string) ([]users.Address, error) {
 	if id == "" {
-		as, err := db.GetAddresses()
+		as, err := s.Database.GetAddresses()
 		for k, a := range as {
 			a.AddLinks()
 			as[k] = a
 		}
 		return as, err
 	}
-	a, err := db.GetAddress(id)
+	a, err := s.Database.GetAddress(id)
 	a.AddLinks()
 	return []users.Address{a}, err
 }
 
 func (s *fixedService) PostAddress(add users.Address, userid string) bool {
-	err := db.CreateAddress(&add, userid)
+	err := s.Database.CreateAddress(&add, userid)
 	if err != nil {
 		return false
 	}
@@ -109,20 +111,20 @@ func (s *fixedService) PostAddress(add users.Address, userid string) bool {
 
 func (s *fixedService) GetCards(id string) ([]users.Card, error) {
 	if id == "" {
-		cs, err := db.GetCards()
+		cs, err := s.Database.GetCards()
 		for k, c := range cs {
 			c.AddLinks()
 			cs[k] = c
 		}
 		return cs, err
 	}
-	c, err := db.GetCard(id)
+	c, err := s.Database.GetCard(id)
 	c.AddLinks()
 	return []users.Card{c}, err
 }
 
 func (s *fixedService) PostCard(card users.Card, userid string) bool {
-	err := db.CreateCard(&card, userid)
+	err := s.Database.CreateCard(&card, userid)
 	if err != nil {
 		return false
 	}

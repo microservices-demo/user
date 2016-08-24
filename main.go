@@ -56,7 +56,7 @@ func main() {
 	// Service domain.
 	var service api.Service
 	{
-		service = api.NewFixedService()
+		service = api.NewFixedService(db.DefaultDb)
 		service = api.LoggingMiddleware(logger)(service)
 	}
 

@@ -1,23 +1,17 @@
 package db
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
+	"github.com/microservices-demo/user/tests"
 	"github.com/microservices-demo/user/users"
 )
 
 var (
-	TestDB       = fake{}
-	ErrFakeError = errors.New("Fake error")
-	TestAddress  = users.Address{
-		Street:  "street",
-		Number:  "51b",
-		Country: "Netherlands",
-		City:    "Amsterdam",
-		ID:      "000056",
-	}
+	ErrFakeError = tests.ErrFakeError
+	TestAddress  = tests.TestAddress
+	TestDB       = tests.FakeDB{}
 )
 
 func TestInit(t *testing.T) {
@@ -29,7 +23,7 @@ func TestInit(t *testing.T) {
 	database = "test"
 	err = Init()
 	if err != ErrFakeError {
-		t.Error("expected fake db error from init")
+		t.Error("expected FakeDB db error from init")
 	}
 }
 
@@ -63,21 +57,21 @@ func TestRegister(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	err := CreateUser(&users.User{})
 	if err != ErrFakeError {
-		t.Error("expected fake db error from create")
+		t.Error("expected FakeDB db error from create")
 	}
 }
 
 func TestGetUser(t *testing.T) {
 	_, err := GetUser("test")
 	if err != ErrFakeError {
-		t.Error("expected fake db error from get")
+		t.Error("expected FakeDB db error from get")
 	}
 }
 
 func TestGetUserByName(t *testing.T) {
 	_, err := GetUserByName("test")
 	if err != ErrFakeError {
-		t.Error("expected fake db error from get")
+		t.Error("expected FakeDB db error from get")
 	}
 }
 
@@ -90,53 +84,4 @@ func TestGetUserAttributes(t *testing.T) {
 	if !reflect.DeepEqual(u.Addresses[0], TestAddress) {
 		t.Error("expected matching addresses")
 	}
-}
-
-type fake struct{}
-
-func (f fake) Init() error {
-	return ErrFakeError
-}
-func (f fake) GetUserByName(name string) (users.User, error) {
-	return users.User{}, ErrFakeError
-}
-func (f fake) GetUser(id string) (users.User, error) {
-	return users.User{}, ErrFakeError
-}
-
-func (f fake) GetUsers() ([]users.User, error) {
-	return make([]users.User, 0), ErrFakeError
-}
-
-func (f fake) CreateUser(*users.User) error {
-	return ErrFakeError
-}
-
-func (f fake) GetUserAttributes(u *users.User) error {
-	u.Addresses = append(u.Addresses, TestAddress)
-	return nil
-}
-
-func (f fake) GetCard(id string) (users.Card, error) {
-	return users.Card{}, ErrFakeError
-}
-
-func (f fake) GetCards() ([]users.Card, error) {
-	return make([]users.Card, 0), ErrFakeError
-}
-
-func (f fake) CreateCard(c *users.Card, id string) error {
-	return ErrFakeError
-}
-
-func (f fake) GetAddress(id string) (users.Address, error) {
-	return users.Address{}, ErrFakeError
-}
-
-func (f fake) GetAddresses() ([]users.Address, error) {
-	return make([]users.Address, 0), ErrFakeError
-}
-
-func (f fake) CreateAddress(u *users.Address, id string) error {
-	return ErrFakeError
 }

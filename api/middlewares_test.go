@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	TestLogger     bogusLogger = newBogusLogger()
-	TestMiddleWare Service     = LoggingMiddleware(TestLogger)(NewFixedService())
+	TestLogger bogusLogger = newBogusLogger()
+	//TestMiddleWare Service     = LoggingMiddleware(TestLogger)(NewFixedService())
 )
 
 type bogusLogger struct {
