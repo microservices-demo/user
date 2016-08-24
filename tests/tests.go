@@ -94,3 +94,37 @@ func (f FakeDB) CreateAddress(a *users.Address, id string) error {
 	}
 	return ErrFakeError
 }
+
+type TestServiceStruct struct{}
+
+func (s *TestServiceStruct) Login(username, password string) (users.User, error) {
+	return users.User{}, nil
+}
+
+func (s *TestServiceStruct) Register(username, password, email string) bool {
+	return false
+}
+
+func (s *TestServiceStruct) GetUsers(id string) ([]users.User, error) {
+	return make([]users.User, 0), nil
+}
+
+func (s *TestServiceStruct) PostUser(user users.User) bool {
+	return false
+}
+
+func (s *TestServiceStruct) GetAddresses(id string) ([]users.Address, error) {
+	return make([]users.Address, 0), nil
+}
+
+func (s *TestServiceStruct) PostAddress(add users.Address, userid string) bool {
+	return false
+}
+
+func (s *TestServiceStruct) GetCards(id string) ([]users.Card, error) {
+	return make([]users.Card, 0), nil
+}
+
+func (s *TestServiceStruct) PostCard(card users.Card, userid string) bool {
+	return false
+}
