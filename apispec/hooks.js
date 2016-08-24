@@ -1,12 +1,5 @@
 const hooks = require('hooks');
 
-hooks.beforeEach(function(transaction, done) {
-    if (process.env.DREDD_PROXY_ORIG_URL) {
-        transaction.fullPath = process.env.DREDD_PROXY_ORIG_URL + transaction.fullPath;
-    }
-    done();
-})
-
 hooks.before("/login > GET", function(transaction, done) {
     transaction.skip = true;
     done();

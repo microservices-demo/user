@@ -58,19 +58,8 @@ dockertravisbuild: build
 	scripts/push.sh
 
 
-mockservice: dockerruntest
-	scripts/testcontainer.sh
-	docker run -d -p 32818:8888 --name hoverfly-user -h hoverfly-user --link $(INSTANCE)-dev spectolabs/hoverfly
-	sleep 2
-	curl -H "Content-Type application/json" -X POST -d '{"mode":"capture"}' http://localhost:32818/api/state
-
-	docker run -h openapi -e DREDD_PROXY_ORIG_URL=http://$(INSTANCE)-dev:8084 \
-			--name $(OPENAPI) --link user-dev --link hoverfly-user -v $(PWD)/apispec/:/tmp/specs/ \
-			weaveworksdemos/openapi /tmp/specs/$(INSTANCE).json\
-			http://hoverfly-user:8500 \
-			-f /tmp/specs/hooks.js
-
-	curl -H "Content-Type application/json" -X POST -d '{"mode":"simulate"}' http://localhost:32818/api/state
+mockservice: 
+	docker run -d --name user-mock -h user-mock -v $(PWD)/apispec/mock.json:/data/db.json clue/json-server
 
 dockertest: dockerruntest
 	scripts/testcontainer.sh
@@ -83,8 +72,8 @@ dockertest: dockerruntest
 cleandocker:
 	-docker rm -f my$(TESTDB)
 	-docker rm -f $(INSTANCE)-dev
-	-docker rm -f hoverfly-user
 	-docker rm -f $(OPENAPI)
+	-docker rm -f user-mock
 
 clean: cleandocker 
 	rm -rf bin
