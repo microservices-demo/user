@@ -9,7 +9,7 @@ type Card struct {
 	LongNum string `json:"longNum" bson:"longNum"`
 	Expires string `json:"expires" bson:"expires"`
 	CCV     string `json:"ccv" bson:"ccv"`
-	ID      string `json:"-" bson:"-"`
+	ID      string `json:"id" bson:"-"`
 	Links   Links  `json:"_links" bson:"-"`
 }
 

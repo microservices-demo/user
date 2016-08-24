@@ -58,16 +58,6 @@ func (u *User) MaskCCs() {
 
 func (u *User) AddLinks() {
 	u.Links.AddCustomer(u.UserID)
-	for k, c := range u.Cards {
-		c.AddLinks()
-		u.Cards[k] = c
-		u.Links.AddAttrCard(c.ID)
-	}
-	for k, a := range u.Addresses {
-		a.AddLinks()
-		u.Addresses[k] = a
-		u.Links.AddAttrAddress(a.ID)
-	}
 }
 
 func (u *User) NewSalt() {

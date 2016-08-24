@@ -31,6 +31,7 @@ coverprofile:
 	go test -v -covermode=count -coverprofile=db.coverprofile ./db
 	go test -v -covermode=count -coverprofile=mongo.coverprofile ./db/mongodb
 	go test -v -covermode=count -coverprofile=api.coverprofile ./api
+	go test -v -covermode=count -coverprofile=users.coverprofile ./users
 	gover
 	mv gover.coverprofile cover.profile
 	rm *.coverprofile

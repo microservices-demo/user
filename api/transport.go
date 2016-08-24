@@ -14,10 +14,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-type EmbedStruct struct {
-	Embed interface{} `json:"_embedded"`
-}
-
 // MakeHTTPHandler mounts the endpoints into a REST-y HTTP handler.
 func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger) http.Handler {
 	r := mux.NewRouter().StrictSlash(false)
@@ -48,21 +44,21 @@ func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger) http.H
 		ctx,
 		e.UserGetEndpoint,
 		decodeGetRequest,
-		encodeEmbedResponse,
+		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").PathPrefix("/cards").Handler(httptransport.NewServer(
 		ctx,
 		e.CardGetEndpoint,
 		decodeGetRequest,
-		encodeEmbedResponse,
+		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").PathPrefix("/addresses").Handler(httptransport.NewServer(
 		ctx,
 		e.AddressGetEndpoint,
 		decodeGetRequest,
-		encodeEmbedResponse,
+		encodeResponse,
 		options...,
 	))
 	r.Methods("POST").Path("/customers").Handler(httptransport.NewServer(
@@ -103,7 +99,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		code = http.StatusUnauthorized
 	}
 	w.WriteHeader(code)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", "application/hal+json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"error":       err.Error(),
 		"status_code": code,
@@ -138,8 +134,11 @@ func decodeRegisterRequest(_ context.Context, r *http.Request) (interface{}, err
 func decodeGetRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	g := GetRequest{}
 	u := strings.Split(r.URL.Path, "/")
-	if len(u) == 3 {
+	if len(u) > 2 {
 		g.ID = u[2]
+		if len(u) > 3 {
+			g.Attr = u[3]
+		}
 	}
 	return g, nil
 }
@@ -184,13 +183,6 @@ func encodeHealthResponse(ctx context.Context, w http.ResponseWriter, response i
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	// All of our response objects are JSON serializable, so we just do that.
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", "application/hal+json")
 	return json.NewEncoder(w).Encode(response)
-}
-
-func encodeEmbedResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	// All of our response objects are JSON serializable, so we just do that.
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	er := EmbedStruct{Embed: response}
-	return json.NewEncoder(w).Encode(er)
 }
