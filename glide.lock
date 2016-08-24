@@ -32,8 +32,3 @@ imports:
   - internal/scram
 - name: gopkg.in/tomb.v2
   version: 14b3d72120e8d10ea6e6b7f87f7175734b1faab8
-testImports:
-- name: github.com/davecgh/go-spew
-  version: 6cf5744a041a0022271cefed95ba843f6d87fd51
-  subpackages:
-  - spew
