@@ -58,6 +58,10 @@ func (f FakeDB) GetUserAttributes(u *users.User) error {
 }
 
 func (f FakeDB) GetCard(id string) (users.Card, error) {
+	if id == "realcard" {
+		u := users.Card{}
+		return u, nil
+	}
 	return users.Card{}, ErrFakeError
 }
 
@@ -66,6 +70,9 @@ func (f FakeDB) GetCards() ([]users.Card, error) {
 }
 
 func (f FakeDB) CreateCard(c *users.Card, id string) error {
+	if c.LongNum == "passtest" {
+		return nil
+	}
 	return ErrFakeError
 }
 
@@ -81,6 +88,9 @@ func (f FakeDB) GetAddresses() ([]users.Address, error) {
 	return make([]users.Address, 0), ErrFakeError
 }
 
-func (f FakeDB) CreateAddress(u *users.Address, id string) error {
+func (f FakeDB) CreateAddress(a *users.Address, id string) error {
+	if a.Street == "passtest" {
+		return nil
+	}
 	return ErrFakeError
 }
