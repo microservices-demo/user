@@ -23,8 +23,8 @@ addons:
   ssh_known_hosts: $BASTION
 before_deploy:
   - eval "$(ssh-agent -s)"
-  - chmod 600 $TRAVIS_BUILD_DIR/deploy_rsa
-  - ssh-add $TRAVIS_BUILD_DIR/deploy_rsa
+  - chmod 600 $TRAVIS_BUILD_DIR/user_deploy_rsa
+  - ssh-add $TRAVIS_BUILD_DIR/user_deploy_rsa
 deploy:
   provider: script
   skip_cleanup: true
