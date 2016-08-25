@@ -47,3 +47,21 @@ func TestMakeRegisterEndpointEndpoint(t *testing.T) {
 		t.Error("expected true for register")
 	}
 }
+
+func TestMakeUserGetEndpoint(t *testing.T) {
+}
+
+func TestMakeUserPostEndpoint(t *testing.T) {
+}
+
+func TestMakeAddressGetEndpoint(t *testing.T) {
+}
+
+func TestMakeAddressPostEndpoint(t *testing.T) {
+}
+
+func TestMakeCardGetEndpoint(t *testing.T) {
+}
+
+func TestMakeCardPostEndpoint(t *testing.T) {
+}
