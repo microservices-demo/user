@@ -74,9 +74,11 @@ func (s *fixedService) GetUsers(id string) ([]users.User, error) {
 	return []users.User{u}, err
 }
 
-func (s *fixedService) PostUser(user users.User) (string, error) {
-	err := db.CreateUser(&user)
-	return user.UserID, err
+func (s *fixedService) PostUser(u users.User) (string, error) {
+	u.NewSalt()
+	u.Password = calculatePassHash(u.Password, u.Salt)
+	err := db.CreateUser(&u)
+	return u.UserID, err
 }
 
 func (s *fixedService) GetAddresses(id string) ([]users.Address, error) {
