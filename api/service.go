@@ -20,14 +20,14 @@ var (
 // Service is the user service, providing operations for users to login, register, and retrieve customer information.
 type Service interface {
 	Login(username, password string) (users.User, error) // GET /login
-	// Only used for testing at the moment
-	Register(username, password, email string) bool
+	Register(username, password, email string) (string, error)
 	GetUsers(id string) ([]users.User, error)
-	PostUser(u users.User) bool
+	PostUser(u users.User) (string, error)
 	GetAddresses(id string) ([]users.Address, error)
-	PostAddress(u users.Address, userid string) bool
+	PostAddress(u users.Address, userid string) (string, error)
 	GetCards(id string) ([]users.Card, error)
-	PostCard(u users.Card, userid string) bool
+	PostCard(u users.Card, userid string) (string, error)
+	Delete(entity, id string) error
 }
 
 // NewFixedService returns a simple implementation of the Service interface,
@@ -51,16 +51,13 @@ func (s *fixedService) Login(username, password string) (users.User, error) {
 
 }
 
-func (s *fixedService) Register(username, password, email string) bool {
+func (s *fixedService) Register(username, password, email string) (string, error) {
 	u := users.New()
 	u.Username = username
 	u.Password = calculatePassHash(password, u.Salt)
 	u.Email = email
 	err := db.CreateUser(&u)
-	if err != nil {
-		return false
-	}
-	return true
+	return u.UserID, err
 }
 
 func (s *fixedService) GetUsers(id string) ([]users.User, error) {
@@ -77,12 +74,9 @@ func (s *fixedService) GetUsers(id string) ([]users.User, error) {
 	return []users.User{u}, err
 }
 
-func (s *fixedService) PostUser(user users.User) bool {
+func (s *fixedService) PostUser(user users.User) (string, error) {
 	err := db.CreateUser(&user)
-	if err != nil {
-		return false
-	}
-	return true
+	return user.UserID, err
 }
 
 func (s *fixedService) GetAddresses(id string) ([]users.Address, error) {
@@ -99,12 +93,9 @@ func (s *fixedService) GetAddresses(id string) ([]users.Address, error) {
 	return []users.Address{a}, err
 }
 
-func (s *fixedService) PostAddress(add users.Address, userid string) bool {
+func (s *fixedService) PostAddress(add users.Address, userid string) (string, error) {
 	err := db.CreateAddress(&add, userid)
-	if err != nil {
-		return false
-	}
-	return true
+	return add.ID, err
 }
 
 func (s *fixedService) GetCards(id string) ([]users.Card, error) {
@@ -121,12 +112,13 @@ func (s *fixedService) GetCards(id string) ([]users.Card, error) {
 	return []users.Card{c}, err
 }
 
-func (s *fixedService) PostCard(card users.Card, userid string) bool {
+func (s *fixedService) PostCard(card users.Card, userid string) (string, error) {
 	err := db.CreateCard(&card, userid)
-	if err != nil {
-		return false
-	}
-	return true
+	return card.ID, err
+}
+
+func (s *fixedService) Delete(entity, id string) error {
+	return db.Delete(entity, id)
 }
 
 func calculatePassHash(pass, salt string) string {

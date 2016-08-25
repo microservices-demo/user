@@ -23,6 +23,7 @@ type Database interface {
 	CreateAddress(*users.Address, string) error
 	GetCard(string) (users.Card, error)
 	GetCards() ([]users.Card, error)
+	Delete(string, string) error
 	CreateCard(*users.Card, string) error
 }
 
@@ -156,4 +157,9 @@ func GetCards() ([]users.Card, error) {
 		cs[k].AddLinks()
 	}
 	return cs, err
+}
+
+//Delete invokes DefaultDb method
+func Delete(entity, id string) error {
+	return DefaultDb.Delete(entity, id)
 }

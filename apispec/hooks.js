@@ -20,12 +20,10 @@ hooks.before("/addresses > POST", function(transaction, done) {
     transaction.request.headers['Content-Type'] = 'application/json';
     transaction.request.body = JSON.stringify(
 	{
-	    "address":{
 	    	"street": "teststreet",
 	    	"number": "15",
 	    	"country": "The Netherlands",
 		"city": "Den Haag"
-	    }
 	}
     );
     done();
@@ -35,11 +33,9 @@ hooks.before("/cards > POST", function(transaction, done) {
     transaction.request.headers['Content-Type'] = 'application/json';
     transaction.request.body = JSON.stringify(
 	{
-	    "card":{
 	    	"longNum": "1111222233334444",
 	    	"expires": "11/2020",
 	    	"ccv": "123"
-	    }
 	}
     );
     done();

@@ -5,13 +5,19 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
+	"github.com/microservices-demo/user/users"
 	"golang.org/x/net/context"
+)
+
+var (
+	ErrInvalidRequest = errors.New("Invalid request")
 )
 
 // MakeHTTPHandler mounts the endpoints into a REST-y HTTP handler.
@@ -82,6 +88,13 @@ func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger) http.H
 		encodeResponse,
 		options...,
 	))
+	r.Methods("DELETE").PathPrefix("/").Handler(httptransport.NewServer(
+		ctx,
+		e.DeleteEndpoint,
+		decodeDeleteRequest,
+		encodeResponse,
+		options...,
+	))
 	r.Methods("GET").PathPrefix("/health").Handler(httptransport.NewServer(
 		ctx,
 		e.HealthEndpoint,
@@ -131,6 +144,17 @@ func decodeRegisterRequest(_ context.Context, r *http.Request) (interface{}, err
 	}, nil
 }
 
+func decodeDeleteRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	d := deleteRequest{}
+	u := strings.Split(r.URL.Path, "/")
+	if len(u) == 3 {
+		d.Entity = u[1]
+		d.ID = u[2]
+		return d, nil
+	}
+	return d, ErrInvalidRequest
+}
+
 func decodeGetRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	g := GetRequest{}
 	u := strings.Split(r.URL.Path, "/")
@@ -145,7 +169,7 @@ func decodeGetRequest(_ context.Context, r *http.Request) (interface{}, error) {
 
 func decodeUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	defer r.Body.Close()
-	u := userPostRequest{}
+	u := users.User{}
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
 		return nil, err

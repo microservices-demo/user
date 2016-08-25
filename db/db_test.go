@@ -141,3 +141,7 @@ func (f fake) GetAddresses() ([]users.Address, error) {
 func (f fake) CreateAddress(u *users.Address, id string) error {
 	return ErrFakeError
 }
+
+func (f fake) Delete(entity, id string) error {
+	return ErrFakeError
+}

@@ -23,6 +23,7 @@ type Endpoints struct {
 	AddressPostEndpoint endpoint.Endpoint
 	CardGetEndpoint     endpoint.Endpoint
 	CardPostEndpoint    endpoint.Endpoint
+	DeleteEndpoint      endpoint.Endpoint
 	HealthEndpoint      endpoint.Endpoint
 }
 
@@ -38,6 +39,7 @@ func MakeEndpoints(s Service) Endpoints {
 		AddressGetEndpoint:  MakeAddressGetEndpoint(s),
 		AddressPostEndpoint: MakeAddressPostEndpoint(s),
 		CardGetEndpoint:     MakeCardGetEndpoint(s),
+		DeleteEndpoint:      MakeDeleteEndpoint(s),
 		CardPostEndpoint:    MakeCardPostEndpoint(s),
 	}
 }
@@ -55,8 +57,8 @@ func MakeLoginEndpoint(s Service) endpoint.Endpoint {
 func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(registerRequest)
-		status := s.Register(req.Username, req.Password, req.Email)
-		return statusResponse{Status: status}, err
+		id, err := s.Register(req.Username, req.Password, req.Email)
+		return postResponse{ID: id}, err
 	}
 }
 
@@ -92,9 +94,9 @@ func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 // MakeUserPostEndpoint returns an endpoint via the given service.
 func MakeUserPostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(userPostRequest)
-		status := s.PostUser(req.User)
-		return statusResponse{Status: status}, err
+		req := request.(users.User)
+		id, err := s.PostUser(req)
+		return postResponse{ID: id}, err
 	}
 }
 
@@ -117,8 +119,8 @@ func MakeAddressGetEndpoint(s Service) endpoint.Endpoint {
 func MakeAddressPostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(addressPostRequest)
-		status := s.PostAddress(req.Address, req.UserID)
-		return statusResponse{Status: status}, err
+		id, err := s.PostAddress(req.Address, req.UserID)
+		return postResponse{ID: id}, err
 	}
 }
 
@@ -141,8 +143,20 @@ func MakeCardGetEndpoint(s Service) endpoint.Endpoint {
 func MakeCardPostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(cardPostRequest)
-		status := s.PostCard(req.Card, req.UserID)
-		return statusResponse{Status: status}, err
+		id, err := s.PostCard(req.Card, req.UserID)
+		return postResponse{ID: id}, err
+	}
+}
+
+// MakeLoginEndpoint returns an endpoint via the given service.
+func MakeDeleteEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(deleteRequest)
+		err = s.Delete(req.Entity, req.ID)
+		if err == nil {
+			return statusResponse{Status: true}, err
+		}
+		return statusResponse{Status: false}, err
 	}
 }
 
@@ -163,10 +177,6 @@ type loginRequest struct {
 	Password string
 }
 
-type userPostRequest struct {
-	User users.User `json:"user"`
-}
-
 type userResponse struct {
 	User users.User `json:"user"`
 }
@@ -176,8 +186,8 @@ type usersResponse struct {
 }
 
 type addressPostRequest struct {
-	Address users.Address `json:"address"`
-	UserID  string        `json:"userID"`
+	users.Address
+	UserID string `json:"userID"`
 }
 
 type addressesResponse struct {
@@ -185,8 +195,8 @@ type addressesResponse struct {
 }
 
 type cardPostRequest struct {
-	Card   users.Card `json:"card"`
-	UserID string     `json:"userID"`
+	users.Card
+	UserID string `json:"userID"`
 }
 
 type cardsResponse struct {
@@ -201,6 +211,15 @@ type registerRequest struct {
 
 type statusResponse struct {
 	Status bool `json:"status"`
+}
+
+type postResponse struct {
+	ID string `json:"id"`
+}
+
+type deleteRequest struct {
+	Entity string
+	ID     string
 }
 
 type healthRequest struct {

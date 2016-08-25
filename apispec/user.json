@@ -118,6 +118,31 @@
                   }
                }
             }
+         },
+         "delete":{
+            "description":"Delete customer",
+            "operationId":"Delete customer",
+            "produces":[
+               "application/json;charset=UTF-8"
+            ],
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "description":"ID of customer to delete",
+                  "required":true,
+                  "type":"string",
+                  "default":"57a98d98e4b00679b4a830b5"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"",
+                  "schema":{
+                     "$ref":"#/definitions/Deleteresponse"
+                  }
+               }
+            }
          }
       },
       "/customers/{id}/cards":{
@@ -245,6 +270,31 @@
                   }
                }
             }
+         },
+         "delete":{
+            "description":"Delete card",
+            "operationId":"Delete card",
+            "produces":[
+               "application/json;charset=UTF-8"
+            ],
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "description":"ID of card to delete",
+                  "required":true,
+                  "type":"string",
+                  "default":"57a98d98e4b00679b4a830ae"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"",
+                  "schema":{
+                     "$ref":"#/definitions/Deleteresponse"
+                  }
+               }
+            }
          }
       },
       "/addresses":{
@@ -318,7 +368,32 @@
                   }
                }
             }
-         }
+         },
+         "delete":{
+            "description":"Delete address",
+            "operationId":"Delete address",
+            "produces":[
+               "application/json;charset=UTF-8"
+            ],
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "description":"ID of address to delete",
+                  "required":true,
+                  "type":"string",
+                  "default":"57a98d98e4b00679b4a830ad"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"",
+                  "schema":{
+                     "$ref":"#/definitions/Deleteresponse"
+                  }
+               }
+             }
+          }
       }
    },
 
@@ -377,6 +452,18 @@
       },
       "Statusresponse":{
          "title":"Post status response",
+         "type":"object",
+         "properties":{
+            "id":{
+               "type":"string"
+            }
+         },
+         "required":[
+            "id"
+         ]
+      },
+      "Deleteresponse":{
+         "title":"Delete status response",
          "type":"object",
          "properties":{
             "status":{
@@ -622,22 +709,17 @@
          "title":"Post Card",
          "type":"object",
          "properties":{
-            "card":{
-               "type":"object",
-               "properties":{
-                  "longNum":{
-                     "description":"Credit card number",
-                     "type":"string"
-                  },
-                  "expires":{
-                     "description":"Card expiration",
-                     "type":"string"
-                  },
-                  "ccv":{
-                     "description":"Card ccv",
-                     "type":"string"
-                  }
-               }
+            "longNum":{
+              "description":"Credit card number",
+              "type":"string"
+            },
+            "expires":{
+              "description":"Card expiration",
+              "type":"string"
+            },
+            "ccv":{
+              "description":"Card ccv",
+              "type":"string"
             },
             "userID":{
                "description":"User to attach this card to.",
@@ -649,27 +731,21 @@
          "title":"Post Address",
          "type":"object",
          "properties":{
-            "address":{
-               "description":"Address",
-               "type":"object",
-               "properties":{
-                  "street":{
-                     "type":"string"
-                  },
-                  "number":{
-                     "type":"string"
-                  },
-                  "country":{
-                     "type":"string"
-                  },
-                  "city":{
-                     "type":"string"
-                  },
-                  "postcode":{
-                     "type":"string"
-                  }
-               }
-            },
+	  "street":{
+	     "type":"string"
+	  },
+	  "number":{
+	     "type":"string"
+	  },
+	  "country":{
+	     "type":"string"
+	  },
+	  "city":{
+	     "type":"string"
+	  },
+	  "postcode":{
+	     "type":"string"
+	  },
             "userID":{
                "description":"User to attach this card to.",
                "type":"string"
