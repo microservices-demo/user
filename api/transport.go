@@ -123,7 +123,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 func decodeLoginRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	u, p, ok := r.BasicAuth()
 	if !ok {
-		return nil, ErrUnauthorized
+		return loginRequest{}, ErrUnauthorized
 	}
 
 	return loginRequest{
@@ -133,15 +133,12 @@ func decodeLoginRequest(_ context.Context, r *http.Request) (interface{}, error)
 }
 
 func decodeRegisterRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	u := r.FormValue("username")
-	p := r.FormValue("password")
-	e := r.FormValue("email")
-
-	return registerRequest{
-		Username: u,
-		Password: p,
-		Email:    e,
-	}, nil
+	reg := registerRequest{}
+	err := json.NewDecoder(r.Body).Decode(&reg)
+	if err != nil {
+		return nil, err
+	}
+	return reg, nil
 }
 
 func decodeDeleteRequest(_ context.Context, r *http.Request) (interface{}, error) {

@@ -29,8 +29,6 @@ func (mw loggingMiddleware) Login(username, password string) (user users.User, e
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "Login",
-			"username", username,
-			"result", user.UserID,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
