@@ -34,5 +34,4 @@ Accessible at localhost:8084
 
 /register
 
-
 Test user account passwords can be found in the comments in users-db-test/scripts/customer-insert.js
