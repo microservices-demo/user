@@ -28,6 +28,6 @@ before_deploy:
 deploy:
   provider: script
   skip_cleanup: true
-  script: ssh -o StrictHostKeyChecking=no ${BASTION_USER}@${BASTION} ./deploy.sh accounts $COMMIT
+  script: ssh -o StrictHostKeyChecking=no ${BASTION_USER}@${BASTION} ./deploy.sh user $COMMIT
   on:
     branch: master
