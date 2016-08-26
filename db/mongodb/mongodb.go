@@ -129,7 +129,7 @@ func (m *Mongo) CreateUser(u *users.User) error {
 	if carderr != nil || addrerr != nil {
 		return fmt.Errorf("%v %v", carderr, addrerr)
 	}
-	u = &mu.User
+	*u = mu.User
 	return nil
 }
 
@@ -183,9 +183,17 @@ func (m *Mongo) cleanAttributes(mu MongoUser) error {
 func (m *Mongo) appendAttributeId(attr string, id bson.ObjectId, userid string) error {
 	s := m.Session.Copy()
 	defer s.Close()
-	c := s.DB("").C(attr)
+	c := s.DB("").C("customers")
 	return c.Update(bson.M{"_id": bson.ObjectIdHex(userid)},
-		bson.M{"$addToSet": bson.M{"addresses": id}})
+		bson.M{"$addToSet": bson.M{attr: id}})
+}
+
+func (m *Mongo) removeAttributeId(attr string, id bson.ObjectId, userid string) error {
+	s := m.Session.Copy()
+	defer s.Close()
+	c := s.DB("").C("customers")
+	return c.Update(bson.M{"_id": bson.ObjectIdHex(userid)},
+		bson.M{"$pull": bson.M{attr: id}})
 }
 
 // GetUserByName Get user by their name
@@ -308,7 +316,7 @@ func (m *Mongo) GetCards() ([]users.Card, error) {
 
 // CreateCard adds card to MongoDB
 func (m *Mongo) CreateCard(ca *users.Card, userid string) error {
-	if !bson.IsObjectIdHex(userid) {
+	if userid != "" && !bson.IsObjectIdHex(userid) {
 		return errors.New("Invalid Id Hex")
 	}
 	s := m.Session.Copy()
@@ -321,14 +329,14 @@ func (m *Mongo) CreateCard(ca *users.Card, userid string) error {
 		return err
 	}
 	// Address for anonymous user
-	if id != "" {
+	if userid != "" {
 		err = m.appendAttributeId("cards", mc.ID, userid)
 		if err != nil {
 			return err
 		}
 	}
 	mc.AddID()
-	ca = &mc.Card
+	*ca = mc.Card
 	return err
 }
 
@@ -364,7 +372,7 @@ func (m *Mongo) GetAddresses() ([]users.Address, error) {
 
 // CreateAddress Inserts Address into MongoDB
 func (m *Mongo) CreateAddress(a *users.Address, userid string) error {
-	if !bson.IsObjectIdHex(userid) {
+	if userid != "" && !bson.IsObjectIdHex(userid) {
 		return errors.New("Invalid Id Hex")
 	}
 	s := m.Session.Copy()
@@ -377,15 +385,48 @@ func (m *Mongo) CreateAddress(a *users.Address, userid string) error {
 		return err
 	}
 	// Address for anonymous user
-	if id != "" {
+	if userid != "" {
 		err = m.appendAttributeId("addresses", ma.ID, userid)
 		if err != nil {
 			return err
 		}
 	}
 	ma.AddID()
-	a = &ma.Address
+	*a = ma.Address
 	return err
+}
+
+// CreateAddress Inserts Address into MongoDB
+func (m *Mongo) Delete(entity, id string) error {
+	if !bson.IsObjectIdHex(id) {
+		return errors.New("Invalid Id Hex")
+	}
+	s := m.Session.Copy()
+	defer s.Close()
+	c := s.DB("").C(entity)
+	if entity == "customers" {
+		u, err := m.GetUser(id)
+		if err != nil {
+			return err
+		}
+		aids := make([]bson.ObjectId, 0)
+		for _, a := range u.Addresses {
+			aids = append(aids, bson.ObjectIdHex(a.ID))
+		}
+		cids := make([]bson.ObjectId, 0)
+		for _, c := range u.Cards {
+			cids = append(cids, bson.ObjectIdHex(c.ID))
+		}
+		ac := s.DB("").C("addresses")
+		ac.RemoveAll(bson.M{"_id": bson.M{"$in": aids}})
+		cc := s.DB("").C("cards")
+		cc.RemoveAll(bson.M{"_id": bson.M{"$in": cids}})
+	} else {
+		c := s.DB("").C("customers")
+		c.UpdateAll(bson.M{},
+			bson.M{"$pull": bson.M{entity: bson.ObjectIdHex(id)}})
+	}
+	return c.Remove(bson.M{"_id": bson.ObjectIdHex(id)})
 }
 
 func getURL() url.URL {

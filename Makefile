@@ -51,6 +51,10 @@ docker: build
 	cp -rf bin docker/user/
 	docker build -t $(NAME) -f docker/user/Dockerfile-release docker/user/
 
+dockerlocal: build
+	cp -rf bin docker/user/
+	docker build -t $(INSTANCE)-local -f docker/user/Dockerfile-release docker/user/
+
 dockertravisbuild: build
 	cp -rf bin docker/user/
 	docker build -t $(NAME):$(TAG) -f docker/user/Dockerfile-release docker/user/

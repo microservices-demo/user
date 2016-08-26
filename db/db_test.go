@@ -31,6 +31,7 @@ func TestInit(t *testing.T) {
 	if err != ErrFakeError {
 		t.Error("expected fake db error from init")
 	}
+	TestAddress.AddLinks()
 }
 
 func TestSet(t *testing.T) {
@@ -138,5 +139,9 @@ func (f fake) GetAddresses() ([]users.Address, error) {
 }
 
 func (f fake) CreateAddress(u *users.Address, id string) error {
+	return ErrFakeError
+}
+
+func (f fake) Delete(entity, id string) error {
 	return ErrFakeError
 }
