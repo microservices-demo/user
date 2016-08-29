@@ -1,108 +1,107 @@
-{  
+{
    "swagger":"2.0",
-   "info":{  
+   "info":{
       "version":"",
       "title":"User",
       "description":"Provide Customer login, register, retrieval, as well as card and address retrieval",
-      "license":{  
+      "license":{
          "name":"MIT",
          "url":"http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT"
       }
    },
    "host":"user",
    "basePath":"/",
-   "securityDefinitions":{  
+   "securityDefinitions":{
       "basicAuth": {
         "type": "basic",
         "description" : "HTTP Basic Authentication. Works over `HTTP` and `HTTPS`"
      }
    },
-   "schemes":[  
+   "schemes":[
       "http"
    ],
-   "consumes":[  
+   "consumes":[
       "application/json;charset=UTF-8"
    ],
-   "produces":[  
-      "application/json;charset=UTF-8"
+   "produces":[
+      "application/hal+json"
    ],
-   "paths":{  
-      "/login":{  
+   "paths":{
+      "/login":{
          "get":{
             "security": ["basicAuth":[]],
-
             "description":"Return logged in user",
             "operationId":"Get Login",
-            "produces":[  
+            "produces":[
                "application/json;charset=UTF-8"
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Getcustomersresponse"
                   }
                }
             }
          }
       },
-      "/register":{  
-         "post":{  
+      "/register":{
+         "post":{
             "description":"Register new user",
             "operationId":"Set User",
-            "produces":[  
+            "produces":[
                "application/json;charset=UTF-8"
             ],
-            "parameters":[  
-               {  
+            "parameters":[
+               {
                   "name":"register",
                   "in":"body",
                   "description":"register object",
                   "required":true,
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Register"
                   }
                }
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Statusresponse"
                   }
                }
             }
          }
       },
-      "/customers":{  
-         "get":{  
+      "/customers":{
+         "get":{
             "description":"Returns all customers",
             "operationId":"Get customers",
-            "produces":[  
+            "produces":[
                "application/json;charset=UTF-8"
             ],
-            "parameters":[  
+            "parameters":[
 
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Getcustomersresponse"
                   }
                }
             }
          }
       },
-      "/customers/{id}":{  
-         "get":{  
+      "/customers/{id}":{
+         "get":{
             "description":"Returns a customer",
             "operationId":"Get customer",
-            "produces":[  
+            "produces":[
                "application/json;charset=UTF-8"
             ],
-            "parameters":[  
-               {  
+            "parameters":[
+               {
                   "name":"id",
                   "in":"path",
                   "description":"ID of customer to fetch",
@@ -111,71 +110,150 @@
                   "default":"57a98d98e4b00679b4a830af"
                }
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
-                     "$ref":"#/definitions/Getcustomersresponse"
+                  "schema":{
+                     "$ref":"#/definitions/Customer"
+                  }
+               }
+            }
+         },
+         "delete":{
+            "description":"Delete customer",
+            "operationId":"Delete customer",
+            "produces":[
+               "application/json;charset=UTF-8"
+            ],
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "description":"ID of customer to delete",
+                  "required":true,
+                  "type":"string",
+                  "default":"57a98d98e4b00679b4a830b5"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"",
+                  "schema":{
+                     "$ref":"#/definitions/Deleteresponse"
                   }
                }
             }
          }
       },
-      "/cards":{  
-         "get":{  
-            "description":"Return all cards",
-            "operationId":"Get cards",
-            "produces":[  
+      "/customers/{id}/cards":{
+         "get":{
+            "description":"Returns a customer",
+            "operationId":"Get customer",
+            "produces":[
                "application/json;charset=UTF-8"
             ],
-            "parameters":[  
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "description":"ID of customer to fetch",
+                  "required":true,
+                  "type":"string",
+                  "default":"57a98d98e4b00679b4a830af"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"",
+                  "schema":{
+                     "$ref":"#/definitions/Getcardsresponse"
+                  }
+               }
+            }
+         }
+      },
+      "/customers/{id}/addresses":{
+         "get":{
+            "description":"Returns a customer",
+            "operationId":"Get customer",
+            "produces":[
+               "application/json;charset=UTF-8"
+            ],
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "description":"ID of customer to fetch",
+                  "required":true,
+                  "type":"string",
+                  "default":"57a98d98e4b00679b4a830af"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"",
+                  "schema":{
+                     "$ref":"#/definitions/Listaddressresponse"
+                  }
+               }
+            }
+         }
+      },
+      "/cards":{
+         "get":{
+            "description":"Return all cards",
+            "operationId":"Get cards",
+            "produces":[
+               "application/json;charset=UTF-8"
+            ],
+            "parameters":[
 
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Getcardsresponse"
                   }
                }
             }
          },
-         "post":{  
+         "post":{
             "description":"Create new card",
             "operationId":"Set Card",
-            "produces":[  
+            "produces":[
                "application/json;charset=UTF-8"
             ],
-            "parameters":[  
-               {  
+            "parameters":[
+               {
                   "name":"card",
                   "in":"body",
                   "description":"Credit card",
                   "required":true,
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Postcard"
                   }
                }
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Statusresponse"
                   }
                }
             }
          }
       },
-      "/cards/{id}":{  
-         "get":{  
+      "/cards/{id}":{
+         "get":{
             "description":"Returns a card",
             "operationId":"Get card",
-            "produces":[  
+            "produces":[
                "application/json;charset=UTF-8"
             ],
-            "parameters":[  
-               {  
+            "parameters":[
+               {
                   "name":"id",
                   "in":"path",
                   "description":"ID of card to fetch",
@@ -184,71 +262,96 @@
                   "default":"57a98d98e4b00679b4a830ae"
                }
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
-                     "$ref":"#/definitions/Getcardsresponse"
+                  "schema":{
+                     "$ref":"#/definitions/Card"
+                  }
+               }
+            }
+         },
+         "delete":{
+            "description":"Delete card",
+            "operationId":"Delete card",
+            "produces":[
+               "application/json;charset=UTF-8"
+            ],
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "description":"ID of card to delete",
+                  "required":true,
+                  "type":"string",
+                  "default":"57a98d98e4b00679b4a830ae"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"",
+                  "schema":{
+                     "$ref":"#/definitions/Deleteresponse"
                   }
                }
             }
          }
       },
-      "/addresses":{  
-         "get":{  
+      "/addresses":{
+         "get":{
             "description":"Returns all addresses",
             "operationId":"Get addresses",
-            "produces":[  
+            "produces":[
                "application/json;charset=UTF-8"
             ],
-            "parameters":[  
+            "parameters":[
 
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Listaddressresponse"
                   }
                }
             }
          },
-         "post":{  
+         "post":{
             "description":"Create new address",
             "operationId":"Set Address",
-            "produces":[  
+            "produces":[
                "application/json;charset=UTF-8"
             ],
-            "parameters":[  
-               {  
+            "parameters":[
+               {
                   "name":"address",
                   "in":"body",
                   "description":"Address",
                   "required":true,
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Postaddress"
                   }
                }
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
+                  "schema":{
                      "$ref":"#/definitions/Statusresponse"
                   }
                }
             }
          }
       },
-      "/addresses/{id}":{  
-         "get":{  
+      "/addresses/{id}":{
+         "get":{
             "description":"Returns an address",
             "operationId":"Get address",
-            "produces":[  
+            "produces":[
                "application"
             ],
-            "parameters":[  
-               {  
+            "parameters":[
+               {
                   "name":"id",
                   "in":"path",
                   "description":"ID of address to fetch",
@@ -257,257 +360,295 @@
                   "default":"57a98d98e4b00679b4a830ad"
                }
             ],
-            "responses":{  
-               "200":{  
+            "responses":{
+               "200":{
                   "description":"",
-                  "schema":{  
-                     "$ref":"#/definitions/Listaddressresponse"
+                  "schema":{
+                     "$ref":"#/definitions/Address"
                   }
                }
             }
-         }
+         },
+         "delete":{
+            "description":"Delete address",
+            "operationId":"Delete address",
+            "produces":[
+               "application/json;charset=UTF-8"
+            ],
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "description":"ID of address to delete",
+                  "required":true,
+                  "type":"string",
+                  "default":"57a98d98e4b00679b4a830ad"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"",
+                  "schema":{
+                     "$ref":"#/definitions/Deleteresponse"
+                  }
+               }
+             }
+          }
       }
    },
-   "definitions":{  
-      "Getcustomersresponse":{  
+
+   "definitions":{
+      "Getcustomersresponse":{
          "title":"Get customers response",
          "type":"object",
-         "properties":{  
-            "_embedded":{  
+         "properties":{
+            "_embedded":{
                "type":"object",
-               "properties":{  
-                  "customer":{  
+               "properties":{
+                  "customer":{
                      "type":"array",
-                     "items":{  
+                     "items":{
                         "$ref":"#/definitions/Customer"
                      }
                   }
                }
             },
-            "_links":{  
+            "_links":{
                "type":"object"
             },
-            "page":{  
+            "page":{
                "type":"object"
             }
          },
-         "required":[  
+         "required":[
             "_embedded",
          ]
       },
-      "Getcardsresponse":{  
+      "Getcardsresponse":{
          "title":"Get cards response",
          "type":"object",
-         "properties":{  
-            "_embedded":{  
+         "properties":{
+            "_embedded":{
                "type":"object",
-               "properties":{  
-                  "card":{  
+               "properties":{
+                  "card":{
                      "type":"array",
-                     "items":{  
+                     "items":{
                         "$ref":"#/definitions/Card"
                      }
                   }
                }
             },
-            "_links":{  
+            "_links":{
                "type":"object"
             },
-            "page":{  
+            "page":{
                "type":"object"
             }
          },
-         "required":[  
+         "required":[
             "_embedded",
          ]
       },
-      "Statusresponse":{  
+      "Statusresponse":{
          "title":"Post status response",
          "type":"object",
-         "properties":{  
-            "status":{  
+         "properties":{
+            "id":{
+               "type":"string"
+            }
+         },
+         "required":[
+            "id"
+         ]
+      },
+      "Deleteresponse":{
+         "title":"Delete status response",
+         "type":"object",
+         "properties":{
+            "status":{
                "type":"boolean"
             }
          },
-         "required":[  
+         "required":[
             "status"
          ]
       },
-      "Customer":{  
+      "Customer":{
          "type":"object",
-         "properties":{  
-            "firstName":{  
+         "properties":{
+            "firstName":{
                "type":"string"
             },
-            "lastName":{  
+            "lastName":{
                "type":"string"
             },
-            "username":{  
+            "username":{
                "type":"string"
             },
-            "_links":{  
+            "_links":{
                "type":"object",
-               "properties":{  
-                  "self":{  
+               "properties":{
+                  "self":{
                      "type":"object",
-                     "properties":{  
-                        "href":{  
+                     "properties":{
+                        "href":{
                            "type":"string"
                         }
                      },
-                     "required":[  
+                     "required":[
                         "href"
                      ]
                   },
-                  "customer":{  
+                  "customer":{
                      "type":"object",
-                     "properties":{  
-                        "href":{  
+                     "properties":{
+                        "href":{
                            "type":"string"
                         }
                      },
-                     "required":[  
+                     "required":[
                         "href"
                      ]
                   },
-                  "addresses":{  
+                  "addresses":{
                      "type":"object",
-                     "properties":{  
-                        "href":{  
+                     "properties":{
+                        "href":{
                            "type":"string"
                         }
                      },
-                     "required":[  
+                     "required":[
                         "href"
                      ]
                   },
-                  "cards":{  
+                  "cards":{
                      "type":"object",
-                     "properties":{  
-                        "href":{  
+                     "properties":{
+                        "href":{
                            "type":"string"
                         }
                      },
-                     "required":[  
+                     "required":[
                         "href"
                      ]
                   }
                },
-               "required":[  
+               "required":[
                   "self",
                   "customer",
                ]
             }
          },
-         "required":[  
+         "required":[
             "firstName",
             "lastName",
             "username",
             "_links"
          ]
       },
-      "Card":{  
+      "Card":{
          "type":"object",
-         "properties":{  
-            "longNum":{  
+         "properties":{
+            "longNum":{
                "type":"string"
             },
-            "expires":{  
+            "expires":{
                "type":"string"
             },
-            "ccv":{  
+            "ccv":{
                "type":"string"
             },
-            "_links":{  
+            "_links":{
                "type":"object",
-               "properties":{  
-                  "self":{  
+               "properties":{
+                  "self":{
                      "type":"object",
-                     "properties":{  
-                        "href":{  
+                     "properties":{
+                        "href":{
                            "type":"string"
                         }
                      },
-                     "required":[  
+                     "required":[
                         "href"
                      ]
                   },
-                  "card":{  
+                  "card":{
                      "type":"object",
-                     "properties":{  
-                        "href":{  
+                     "properties":{
+                        "href":{
                            "type":"string"
                         }
                      },
-                     "required":[  
+                     "required":[
                         "href"
                      ]
                   }
                },
-               "required":[  
+               "required":[
                   "self",
                   "card"
                ]
             }
          },
-         "required":[  
+         "required":[
             "longNum",
             "expires",
             "ccv",
             "_links"
          ]
       },
-      "Address":{  
+      "Address":{
          "type":"object",
-         "properties":{  
-            "number":{  
+         "properties":{
+            "number":{
                "type":"string"
             },
-            "street":{  
+            "street":{
                "type":"string"
             },
-            "city":{  
+            "city":{
                "type":"string"
             },
-            "postcode":{  
+            "postcode":{
                "type":"string"
             },
-            "country":{  
+            "country":{
                "type":"string"
             },
-            "_links":{  
+            "_links":{
                "type":"object",
-               "properties":{  
-                  "self":{  
+               "properties":{
+                  "self":{
                      "type":"object",
-                     "properties":{  
-                        "href":{  
+                     "properties":{
+                        "href":{
                            "type":"string"
                         }
                      },
-                     "required":[  
+                     "required":[
                         "href"
                      ]
                   },
-                  "address":{  
+                  "address":{
                      "type":"object",
-                     "properties":{  
-                        "href":{  
+                     "properties":{
+                        "href":{
                            "type":"string"
                         }
                      },
-                     "required":[  
+                     "required":[
                         "href"
                      ]
                   }
                },
-               "required":[  
+               "required":[
                   "self",
                   "address"
                ]
             }
          },
-         "required":[  
+         "required":[
             "number",
             "street",
             "city",
@@ -516,112 +657,101 @@
             "_links"
          ]
       },
-      "Listaddressresponse":{  
+      "Listaddressresponse":{
          "title":"List response",
          "type":"object",
-         "properties":{  
-            "_embedded":{  
+         "properties":{
+            "_embedded":{
                "type":"object",
-               "properties":{  
-                  "address":{  
+               "properties":{
+                  "address":{
                      "type":"array",
-                     "items":{  
+                     "items":{
                         "$ref":"#/definitions/Address"
                      }
                   }
                }
             },
-            "_links":{  
+            "_links":{
                "type":"object"
             },
-            "page":{  
+            "page":{
                "type":"object"
             }
          },
-         "required":[  
+         "required":[
             "_embedded"
          ]
       },
-      "Register":{  
+      "Register":{
          "title":"Register",
          "type":"object",
-         "properties":{  
-            "username":{  
+         "properties":{
+            "username":{
                "description":"Username",
                "type":"string"
             },
-            "password":{  
+            "password":{
                "description":"Password",
                "type":"string"
             },
-            "email":{  
+            "email":{
                "description":"Email",
                "type":"string"
             }
          },
-         "required":[  
+         "required":[
             "username",
             "password"
          ]
       },
-      "Postcard":{  
+      "Postcard":{
          "title":"Post Card",
          "type":"object",
-         "properties":{  
-            "card":{  
-               "type":"object",
-               "properties":{  
-                  "longNum":{  
-                     "description":"Credit card number",
-                     "type":"string"
-                  },
-                  "expires":{  
-                     "description":"Card expiration",
-                     "type":"string"
-                  },
-                  "ccv":{  
-                     "description":"Card ccv",
-                     "type":"string"
-                  }
-               }
+         "properties":{
+            "longNum":{
+              "description":"Credit card number",
+              "type":"string"
             },
-            "userID":{  
+            "expires":{
+              "description":"Card expiration",
+              "type":"string"
+            },
+            "ccv":{
+              "description":"Card ccv",
+              "type":"string"
+            },
+            "userID":{
                "description":"User to attach this card to.",
                "type":"string"
             }
          }
       },
-      "Postaddress":{  
+      "Postaddress":{
          "title":"Post Address",
          "type":"object",
-         "properties":{  
-            "address":{  
-               "description":"Address",
-               "type":"object",
-               "properties":{  
-                  "street":{  
-                     "type":"string"
-                  },
-                  "number":{  
-                     "type":"string"
-                  },
-                  "country":{  
-                     "type":"string"
-                  },
-                  "city":{  
-                     "type":"string"
-                  },
-                  "postcode":{  
-                     "type":"string"
-                  }
-               }
-            },
-            "userID":{  
+         "properties":{
+	  "street":{
+	     "type":"string"
+	  },
+	  "number":{
+	     "type":"string"
+	  },
+	  "country":{
+	     "type":"string"
+	  },
+	  "city":{
+	     "type":"string"
+	  },
+	  "postcode":{
+	     "type":"string"
+	  },
+            "userID":{
                "description":"User to attach this card to.",
                "type":"string"
             }
          },
-         "required":[  
+         "required":[
             "address"
          ]
       }

@@ -33,13 +33,13 @@ func TestFSLogin(t *testing.T) {
 }
 
 func TestFSRegister(t *testing.T) {
-	b := TestFixedService.Register("test", "myemail@here.com", "password")
-	if b {
-		t.Error("expected false for register")
+	_, err := TestFixedService.Register("test", "myemail@here.com", "password")
+	if err == nil {
+		t.Error("expected err for register")
 	}
-	b = TestFixedService.Register("passtest", "myemail@here.com", "password")
-	if !b {
-		t.Error("expected true for register")
+	_, err = TestFixedService.Register("passtest", "myemail@here.com", "password")
+	if err != nil {
+		t.Error(err)
 	}
 }
 
@@ -64,14 +64,14 @@ func TestFSGetUsers(t *testing.T) {
 func TestFSPostUser(t *testing.T) {
 	u := users.New()
 	u.Username = "fakeuser"
-	b := TestFixedService.PostUser(u)
-	if b {
-		t.Error("expected false for post user")
+	_, err := TestFixedService.PostUser(u)
+	if err == nil {
+		t.Error("expected err for post user")
 	}
 	u.Username = "passtest"
-	b = TestFixedService.PostUser(u)
-	if !b {
-		t.Error("expected true for post user")
+	_, err = TestFixedService.PostUser(u)
+	if err != nil {
+		t.Error(err)
 	}
 }
 
@@ -96,14 +96,14 @@ func TestFSGetAddresses(t *testing.T) {
 func TestFSPostAddress(t *testing.T) {
 	a := users.Address{}
 	a.Street = "fakeaddr"
-	b := TestFixedService.PostAddress(a, "")
-	if b {
-		t.Error("expected false for post address")
+	_, err := TestFixedService.PostAddress(a, "")
+	if err == nil {
+		t.Error("expected err for post address")
 	}
 	a.Street = "passtest"
-	b = TestFixedService.PostAddress(a, "")
-	if !b {
-		t.Error("expected true for post address")
+	_, err = TestFixedService.PostAddress(a, "")
+	if err != nil {
+		t.Error(err)
 	}
 }
 
@@ -128,13 +128,28 @@ func TestFSGetCards(t *testing.T) {
 func TestFSPostCard(t *testing.T) {
 	c := users.Card{}
 	c.LongNum = "fakecard"
-	b := TestFixedService.PostCard(c, "")
-	if b {
-		t.Error("expected false for post card")
+	_, err := TestFixedService.PostCard(c, "")
+	if err == nil {
+		t.Error("expected err for post card")
 	}
 	c.LongNum = "passtest"
-	b = TestFixedService.PostCard(c, "")
-	if !b {
-		t.Error("expected true for post card")
+	_, err = TestFixedService.PostCard(c, "")
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestCalculatePassHash(t *testing.T) {
+	hash1 := calculatePassHash("eve", "c748112bc027878aa62812ba1ae00e40ad46d497")
+	if hash1 != "fec51acb3365747fc61247da5e249674cf8463c2" {
+		t.Error("Eve's password failed hash test")
+	}
+	hash2 := calculatePassHash("password", "6c1c6176e8b455ef37da13d953df971c249d0d8e")
+	if hash2 != "e2de7202bb2201842d041f6de201b10438369fb8" {
+		t.Error("user's password failed hash test")
+	}
+	hash3 := calculatePassHash("password", "bd832b0e10c6882deabc5e8e60a37689e2b708c2")
+	if hash3 != "8f31df4dcc25694aeb0c212118ae37bbd6e47bcd" {
+		t.Error("user1's password failed hash test")
 	}
 }

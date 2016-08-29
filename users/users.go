@@ -17,11 +17,11 @@ var (
 type User struct {
 	FirstName string    `json:"firstName" bson:"firstName"`
 	LastName  string    `json:"lastName" bson:"lastName"`
-	Email     string    `json:"email" bson:"email"`
+	Email     string    `json:"-" bson:"email"`
 	Username  string    `json:"username" bson:"username"`
 	Password  string    `json:"-" bson:"password,omitempty"`
-	Addresses []Address `json:"addresses,omitempty" bson:"-"`
-	Cards     []Card    `json:"cards,omitempty" bson:"-"`
+	Addresses []Address `json:"-,omitempty" bson:"-"`
+	Cards     []Card    `json:"-,omitempty" bson:"-"`
 	UserID    string    `json:"id" bson:"-"`
 	Links     Links     `json:"_links"`
 	Salt      string    `json:"-" bson:"salt"`
@@ -58,16 +58,6 @@ func (u *User) MaskCCs() {
 
 func (u *User) AddLinks() {
 	u.Links.AddCustomer(u.UserID)
-	for k, c := range u.Cards {
-		c.AddLinks()
-		u.Cards[k] = c
-		u.Links.AddAttrCard(c.ID)
-	}
-	for k, a := range u.Addresses {
-		a.AddLinks()
-		u.Addresses[k] = a
-		u.Links.AddAttrAddress(a.ID)
-	}
 }
 
 func (u *User) NewSalt() {

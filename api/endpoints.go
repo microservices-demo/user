@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/users"
 	"golang.org/x/net/context"
 )
@@ -22,6 +23,7 @@ type Endpoints struct {
 	AddressPostEndpoint endpoint.Endpoint
 	CardGetEndpoint     endpoint.Endpoint
 	CardPostEndpoint    endpoint.Endpoint
+	DeleteEndpoint      endpoint.Endpoint
 	HealthEndpoint      endpoint.Endpoint
 }
 
@@ -37,6 +39,7 @@ func MakeEndpoints(s Service) Endpoints {
 		AddressGetEndpoint:  MakeAddressGetEndpoint(s),
 		AddressPostEndpoint: MakeAddressPostEndpoint(s),
 		CardGetEndpoint:     MakeCardGetEndpoint(s),
+		DeleteEndpoint:      MakeDeleteEndpoint(s),
 		CardPostEndpoint:    MakeCardPostEndpoint(s),
 	}
 }
@@ -54,8 +57,8 @@ func MakeLoginEndpoint(s Service) endpoint.Endpoint {
 func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(registerRequest)
-		status := s.Register(req.Username, req.Password, req.Email)
-		return statusResponse{Status: status}, err
+		id, err := s.Register(req.Username, req.Password, req.Email)
+		return postResponse{ID: id}, err
 	}
 }
 
@@ -63,17 +66,37 @@ func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetRequest)
-		users, err := s.GetUsers(req.ID)
-		return usersResponse{Users: users}, err
+		usrs, err := s.GetUsers(req.ID)
+		if req.ID == "" {
+			return EmbedStruct{usersResponse{Users: usrs}}, err
+		}
+		if len(usrs) == 0 {
+			if req.Attr == "addresses" {
+				return EmbedStruct{addressesResponse{Addresses: make([]users.Address, 0)}}, err
+			}
+			if req.Attr == "cards" {
+				return EmbedStruct{cardsResponse{Cards: make([]users.Card, 0)}}, err
+			}
+			return users.User{}, err
+		}
+		user := usrs[0]
+		db.GetUserAttributes(&user)
+		if req.Attr == "addresses" {
+			return EmbedStruct{addressesResponse{Addresses: user.Addresses}}, err
+		}
+		if req.Attr == "cards" {
+			return EmbedStruct{cardsResponse{Cards: user.Cards}}, err
+		}
+		return user, err
 	}
 }
 
 // MakeUserPostEndpoint returns an endpoint via the given service.
 func MakeUserPostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(userPostRequest)
-		status := s.PostUser(req.User)
-		return statusResponse{Status: status}, err
+		req := request.(users.User)
+		id, err := s.PostUser(req)
+		return postResponse{ID: id}, err
 	}
 }
 
@@ -82,7 +105,13 @@ func MakeAddressGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetRequest)
 		adds, err := s.GetAddresses(req.ID)
-		return addressesResponse{Addresses: adds}, err
+		if req.ID == "" {
+			return EmbedStruct{addressesResponse{Addresses: adds}}, err
+		}
+		if len(adds) == 0 {
+			return users.Address{}, err
+		}
+		return adds[0], err
 	}
 }
 
@@ -90,8 +119,8 @@ func MakeAddressGetEndpoint(s Service) endpoint.Endpoint {
 func MakeAddressPostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(addressPostRequest)
-		status := s.PostAddress(req.Address, req.UserID)
-		return statusResponse{Status: status}, err
+		id, err := s.PostAddress(req.Address, req.UserID)
+		return postResponse{ID: id}, err
 	}
 }
 
@@ -100,7 +129,13 @@ func MakeCardGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetRequest)
 		cards, err := s.GetCards(req.ID)
-		return cardsResponse{Cards: cards}, err
+		if req.ID == "" {
+			return EmbedStruct{cardsResponse{Cards: cards}}, err
+		}
+		if len(cards) == 0 {
+			return users.Card{}, err
+		}
+		return cards[0], err
 	}
 }
 
@@ -108,8 +143,20 @@ func MakeCardGetEndpoint(s Service) endpoint.Endpoint {
 func MakeCardPostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(cardPostRequest)
-		status := s.PostCard(req.Card, req.UserID)
-		return statusResponse{Status: status}, err
+		id, err := s.PostCard(req.Card, req.UserID)
+		return postResponse{ID: id}, err
+	}
+}
+
+// MakeLoginEndpoint returns an endpoint via the given service.
+func MakeDeleteEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(deleteRequest)
+		err = s.Delete(req.Entity, req.ID)
+		if err == nil {
+			return statusResponse{Status: true}, err
+		}
+		return statusResponse{Status: false}, err
 	}
 }
 
@@ -121,16 +168,13 @@ func MakeHealthEndpoint(s Service) endpoint.Endpoint {
 }
 
 type GetRequest struct {
-	ID string
+	ID   string
+	Attr string
 }
 
 type loginRequest struct {
 	Username string
 	Password string
-}
-
-type userPostRequest struct {
-	User users.User `json:"user"`
 }
 
 type userResponse struct {
@@ -142,8 +186,8 @@ type usersResponse struct {
 }
 
 type addressPostRequest struct {
-	Address users.Address `json:"address"`
-	UserID  string        `json:"userID"`
+	users.Address
+	UserID string `json:"userID"`
 }
 
 type addressesResponse struct {
@@ -151,8 +195,8 @@ type addressesResponse struct {
 }
 
 type cardPostRequest struct {
-	Card   users.Card `json:"card"`
-	UserID string     `json:"userID"`
+	users.Card
+	UserID string `json:"userID"`
 }
 
 type cardsResponse struct {
@@ -160,13 +204,22 @@ type cardsResponse struct {
 }
 
 type registerRequest struct {
-	Username string
-	Password string
-	Email    string
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
 type statusResponse struct {
 	Status bool `json:"status"`
+}
+
+type postResponse struct {
+	ID string `json:"id"`
+}
+
+type deleteRequest struct {
+	Entity string
+	ID     string
 }
 
 type healthRequest struct {
@@ -176,4 +229,8 @@ type healthRequest struct {
 type healthResponse struct {
 	Status string `json:"status"`
 	Time   string `json:"time"`
+}
+
+type EmbedStruct struct {
+	Embed interface{} `json:"_embedded"`
 }

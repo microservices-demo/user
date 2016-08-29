@@ -25,6 +25,7 @@ func TestInit(t *testing.T) {
 	if err != ErrFakeError {
 		t.Error("expected FakeDB db error from init")
 	}
+	TestAddress.AddLinks()
 }
 
 func TestSet(t *testing.T) {

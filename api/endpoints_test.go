@@ -36,15 +36,13 @@ func TestLoginEndpointEndpoint(t *testing.T) {
 }
 
 func TestMakeRegisterEndpointEndpoint(t *testing.T) {
-	b, _ := TestEndpoints.RegisterEndpoint(Ctx, registerRequest{"test", "myemail@here.com", "password"})
-	v := b.(statusResponse)
-	if v.Status {
-		t.Error("expected false for register")
+	_, err := TestEndpoints.RegisterEndpoint(Ctx, registerRequest{"test", "myemail@here.com", "password"})
+	if err == nil {
+		t.Error("expected err for register")
 	}
-	b, _ = TestEndpoints.RegisterEndpoint(Ctx, registerRequest{"passtest", "myemail@here.com", "password"})
-	v = b.(statusResponse)
-	if !v.Status {
-		t.Error("expected true for register")
+	_, err = TestEndpoints.RegisterEndpoint(Ctx, registerRequest{"passtest", "myemail@here.com", "password"})
+	if err != nil {
+		t.Error(err)
 	}
 }
 

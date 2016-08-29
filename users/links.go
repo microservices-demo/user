@@ -30,8 +30,17 @@ func (l *Links) AddLink(ent string, id string) {
 
 }
 
+func (l *Links) AddAttrLink(attr string, corent string, id string) {
+	link := fmt.Sprintf("http://%v/%v/%v/%v", domain, entitymap[corent], id, entitymap[attr])
+	nl := *l
+	nl[entitymap[attr]] = Href{link}
+	*l = nl
+}
+
 func (l *Links) AddCustomer(id string) {
 	l.AddLink("customer", id)
+	l.AddAttrLink("address", "customer", id)
+	l.AddAttrLink("card", "customer", id)
 }
 
 func (l *Links) AddAddress(id string) {
@@ -40,21 +49,6 @@ func (l *Links) AddAddress(id string) {
 
 func (l *Links) AddCard(id string) {
 	l.AddLink("card", id)
-}
-
-func (l *Links) AddAttrLink(attr string, id string) {
-	link := fmt.Sprintf("http://%v/%v/%v", domain, entitymap[attr], id)
-	nl := *l
-	nl[entitymap[attr]] = Href{link}
-	*l = nl
-}
-
-func (l *Links) AddAttrAddress(id string) {
-	l.AddAttrLink("address", id)
-}
-
-func (l *Links) AddAttrCard(id string) {
-	l.AddAttrLink("card", id)
 }
 
 type Href struct {

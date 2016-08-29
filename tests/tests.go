@@ -95,6 +95,10 @@ func (f FakeDB) CreateAddress(a *users.Address, id string) error {
 	return ErrFakeError
 }
 
+func (f FakeDB) Delete(ent string, id string) error {
+	return nil
+}
+
 type TestServiceStruct struct{}
 
 func (s *TestServiceStruct) Login(username, password string) (users.User, error) {
@@ -125,6 +129,10 @@ func (s *TestServiceStruct) GetCards(id string) ([]users.Card, error) {
 	return make([]users.Card, 0), nil
 }
 
-func (s *TestServiceStruct) PostCard(card users.Card, userid string) bool {
-	return false
+func (s *TestServiceStruct) PostCard(card users.Card, userid string) error {
+	return nil
+}
+
+func (s *TestServiceStruct) Delete(ent, id string) error {
+	return nil
 }
