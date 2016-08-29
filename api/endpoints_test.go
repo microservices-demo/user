@@ -17,7 +17,7 @@ var (
 )
 
 func TestMakeEndpoints(t *testing.T) {
-	TestEndpoints = MakeEndpoints(NewFixedService(tests.FakeDB{}))
+	TestEndpoints = MakeEndpoints(NewFixedService(&tests.FakeDB{}))
 }
 
 func TestLoginEndpointEndpoint(t *testing.T) {

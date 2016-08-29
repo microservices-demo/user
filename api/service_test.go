@@ -9,7 +9,7 @@ import (
 
 var (
 	TestFixedService Service
-	TestDB           = tests.FakeDB{}
+	TestDB           = &tests.FakeDB{}
 	ErrFakeError     = tests.ErrFakeError
 )
 
