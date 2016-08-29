@@ -15,49 +15,58 @@ var (
 		City:    "Amsterdam",
 		ID:      "000056",
 	}
+	TestUser users.User
 )
 
-type FakeDB struct{}
+func init() {
+	u := users.New()
+	u.Username = "user"
+	u.Password = "737a21044f994ca25906702c27157ce3f7633f76"
+	u.Salt = "6c1c6176e8b455ef37da13d953df971c249d0d8e"
+	TestUser = u
+}
 
-func (f FakeDB) Init() error {
+type FakeDB struct {
+	PassInit bool
+}
+
+func (f *FakeDB) Init() error {
+	if f.PassInit {
+		return nil
+	}
 	return ErrFakeError
 }
-func (f FakeDB) GetUserByName(name string) (users.User, error) {
+func (f *FakeDB) GetUserByName(name string) (users.User, error) {
 	if name == "user" {
-		u := users.New()
-		u.Username = "user"
-		u.Password = "737a21044f994ca25906702c27157ce3f7633f76"
-		u.Salt = "6c1c6176e8b455ef37da13d953df971c249d0d8e"
-		return u, nil
+		return TestUser, nil
 	}
 	return users.User{}, ErrFakeError
 }
-func (f FakeDB) GetUser(id string) (users.User, error) {
+func (f *FakeDB) GetUser(id string) (users.User, error) {
 	if id == "realuser" {
-		u := users.New()
-		return u, nil
+		return TestUser, nil
 	}
 	return users.User{}, ErrFakeError
 
 }
 
-func (f FakeDB) GetUsers() ([]users.User, error) {
+func (f *FakeDB) GetUsers() ([]users.User, error) {
 	return make([]users.User, 0), ErrFakeError
 }
 
-func (f FakeDB) CreateUser(u *users.User) error {
+func (f *FakeDB) CreateUser(u *users.User) error {
 	if u.Username == "passtest" {
 		return nil
 	}
 	return ErrFakeError
 }
 
-func (f FakeDB) GetUserAttributes(u *users.User) error {
+func (f *FakeDB) GetUserAttributes(u *users.User) error {
 	u.Addresses = append(u.Addresses, TestAddress)
 	return nil
 }
 
-func (f FakeDB) GetCard(id string) (users.Card, error) {
+func (f *FakeDB) GetCard(id string) (users.Card, error) {
 	if id == "realcard" {
 		u := users.Card{}
 		return u, nil
@@ -65,18 +74,18 @@ func (f FakeDB) GetCard(id string) (users.Card, error) {
 	return users.Card{}, ErrFakeError
 }
 
-func (f FakeDB) GetCards() ([]users.Card, error) {
+func (f *FakeDB) GetCards() ([]users.Card, error) {
 	return make([]users.Card, 0), ErrFakeError
 }
 
-func (f FakeDB) CreateCard(c *users.Card, id string) error {
+func (f *FakeDB) CreateCard(c *users.Card, id string) error {
 	if c.LongNum == "passtest" {
 		return nil
 	}
 	return ErrFakeError
 }
 
-func (f FakeDB) GetAddress(id string) (users.Address, error) {
+func (f *FakeDB) GetAddress(id string) (users.Address, error) {
 	if id == "realaddress" {
 		u := users.Address{}
 		return u, nil
@@ -84,18 +93,18 @@ func (f FakeDB) GetAddress(id string) (users.Address, error) {
 	return users.Address{}, ErrFakeError
 }
 
-func (f FakeDB) GetAddresses() ([]users.Address, error) {
+func (f *FakeDB) GetAddresses() ([]users.Address, error) {
 	return make([]users.Address, 0), ErrFakeError
 }
 
-func (f FakeDB) CreateAddress(a *users.Address, id string) error {
+func (f *FakeDB) CreateAddress(a *users.Address, id string) error {
 	if a.Street == "passtest" {
 		return nil
 	}
 	return ErrFakeError
 }
 
-func (f FakeDB) Delete(ent string, id string) error {
+func (f *FakeDB) Delete(ent string, id string) error {
 	return nil
 }
 

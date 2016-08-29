@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -11,13 +12,22 @@ import (
 var (
 	ErrFakeError = tests.ErrFakeError
 	TestAddress  = tests.TestAddress
-	TestDB       = tests.FakeDB{}
+	TestDB       = &tests.FakeDB{}
 )
+
+func init() {
+	TestAddress.AddLinks()
+}
 
 func TestInit(t *testing.T) {
 	err := Init()
 	if err == nil {
 		t.Error("Expected no registered db error")
+	}
+	database = "test"
+	err = Init()
+	if err.Error() != fmt.Sprintf(ErrNoDatabaseFound, "test") {
+		t.Error("expected db not found from init")
 	}
 	Register("test", TestDB)
 	database = "test"
@@ -25,7 +35,11 @@ func TestInit(t *testing.T) {
 	if err != ErrFakeError {
 		t.Error("expected FakeDB db error from init")
 	}
-	TestAddress.AddLinks()
+	TestDB.PassInit = true
+	err = Init()
+	if err != nil {
+		t.Error("expected no error from fake db")
+	}
 }
 
 func TestSet(t *testing.T) {
@@ -63,16 +77,30 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	_, err := GetUser("test")
+	u, err := GetUser("test")
 	if err != ErrFakeError {
 		t.Error("expected FakeDB db error from get")
+	}
+	u, err = GetUser("realuser")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(u.Links) != 4 {
+		t.Errorf("expected 4 links returned received %v", len(u.Links))
 	}
 }
 
 func TestGetUserByName(t *testing.T) {
-	_, err := GetUserByName("test")
+	u, err := GetUserByName("test")
 	if err != ErrFakeError {
 		t.Error("expected FakeDB db error from get")
+	}
+	u, err = GetUserByName("user")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(u.Links) != 4 {
+		t.Errorf("expected 4 links returned received %v", len(u.Links))
 	}
 }
 
