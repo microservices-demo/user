@@ -57,7 +57,7 @@ func MakeLoginEndpoint(s Service) endpoint.Endpoint {
 func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(registerRequest)
-		id, err := s.Register(req.Username, req.Password, req.Email)
+		id, err := s.Register(req.Username, req.Password, req.Email, req.FirstName, req.LastName)
 		return postResponse{ID: id}, err
 	}
 }
@@ -204,9 +204,11 @@ type cardsResponse struct {
 }
 
 type registerRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Email     string `json:"email"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 }
 
 type statusResponse struct {
