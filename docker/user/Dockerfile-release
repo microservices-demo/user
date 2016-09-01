@@ -1,6 +1,7 @@
 FROM busybox:1
 ENV HATEAOS user
 ENV USER_DATABASE mongodb
+ENV MONGO_HOST user-db
 
 WORKDIR /
 EXPOSE 80
