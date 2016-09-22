@@ -11,9 +11,11 @@ import (
 	corelog "log"
 
 	"github.com/go-kit/kit/log"
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/microservices-demo/user/api"
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/db/mongodb"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/net/context"
 )
 
@@ -53,11 +55,29 @@ func main() {
 		}
 	}
 
+	fieldKeys := []string{"method"}
 	// Service domain.
 	var service api.Service
 	{
 		service = api.NewFixedService()
 		service = api.LoggingMiddleware(logger)(service)
+		service = api.NewInstrumentingService(
+			kitprometheus.NewCounterFrom(
+				stdprometheus.CounterOpts{
+					Namespace: "microservices_demo",
+					Subsystem: "user",
+					Name:      "request_count",
+					Help:      "Number of requests received.",
+				},
+				fieldKeys),
+			kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+				Namespace: "microservices_demo",
+				Subsystem: "user",
+				Name:      "request_latency_microseconds",
+				Help:      "Total duration of requests in microseconds.",
+			}, fieldKeys),
+			service,
+		)
 	}
 
 	// Endpoint domain.
