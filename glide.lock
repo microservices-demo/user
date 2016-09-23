@@ -1,12 +1,12 @@
-hash: c5965c301f7206beca5d0b4a1a9954295a6151e365e3d3323ec081d7a591cd8e
-updated: 2016-09-22T22:39:17.110450335+01:00
+hash: 7cf20a5dbbcdf643b0f1dcef14164a797643ebcfb17ec36ecc6f0fbe9d56cf59
+updated: 2016-09-23T11:21:28.08760085+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
 - name: github.com/go-kit/kit
-  version: 988c05d06d8ee3a9c13782f0e49b2c6e4726388d
+  version: 633c2a06b2a7ee99b211d3a382bce1e53f50f6e6
   subpackages:
   - endpoint
   - log
@@ -44,8 +44,8 @@ imports:
   version: 9a94032291f2192936512bab367bc45e77990d6a
   subpackages:
   - expfmt
-  - model
   - internal/bitbucket.org/ww/goautoneg
+  - model
 - name: github.com/prometheus/procfs
   version: abf152e5f3e97f2fafac028d2cc06c1feb87ffa5
 - name: golang.org/x/net
@@ -57,7 +57,10 @@ imports:
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
   - bson
+  - dbtest
+  - internal/json
   - internal/sasl
   - internal/scram
-  - internal/json
-devImports: []
+- name: gopkg.in/tomb.v2
+  version: 14b3d72120e8d10ea6e6b7f87f7175734b1faab8
+testImports: []
