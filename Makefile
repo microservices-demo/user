@@ -62,6 +62,10 @@ dockertravisbuild: build
 	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
 	scripts/push.sh
 
+
+mockservice: 
+	docker run -d --name user-mock -h user-mock -v $(PWD)/apispec/mock.json:/data/db.json clue/json-server
+
 dockertest: dockerruntest
 	scripts/testcontainer.sh
 	docker run -h openapi --rm --name $(OPENAPI) --link user-dev -v $(PWD)/apispec/:/tmp/specs/\
@@ -71,10 +75,10 @@ dockertest: dockerruntest
 	 $(MAKE) cleandocker
 
 cleandocker:
-	-docker stop $(INSTANCE)-dev
-	-docker stop my$(TESTDB)
-	-docker rm my$(TESTDB)
-	-docker rm $(INSTANCE)-dev
+	-docker rm -f my$(TESTDB)
+	-docker rm -f $(INSTANCE)-dev
+	-docker rm -f $(OPENAPI)
+	-docker rm -f user-mock
 
 clean: cleandocker 
 	rm -rf bin

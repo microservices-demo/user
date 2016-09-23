@@ -9,7 +9,7 @@ hooks.before("/register > POST", function(transaction, done) {
     transaction.request.headers['Content-Type'] = 'application/json';
     transaction.request.body = JSON.stringify(
 	{
-	    "username":"testuser",
+	    "username": "testuser",
 	    "password": "testpassword"
 	}
     );
