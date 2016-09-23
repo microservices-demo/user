@@ -4,8 +4,14 @@ import:
   subpackages:
   - endpoint
   - log
+  - metrics
+  - metrics/prometheus
   - transport/http
 - package: github.com/gorilla/mux
+- package: github.com/prometheus/client_golang
+  subpackages:
+  - prometheus
+  - prometheus/promhttp
 - package: golang.org/x/net
   subpackages:
   - context
@@ -13,3 +19,4 @@ import:
   subpackages:
   - bson
 - package: gopkg.in/tomb.v2
+
