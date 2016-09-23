@@ -172,13 +172,13 @@ func (s *instrumentingService) Login(username, password string) (users.User, err
 	return s.Service.Login(username, password)
 }
 
-func (s *instrumentingService) Register(username, password, email string) (string, error) {
+func (s *instrumentingService) Register(username, password, email, first, last string) (string, error) {
 	defer func(begin time.Time) {
 		s.requestCount.With("method", "register").Add(1)
 		s.requestLatency.With("method", "register").Observe(time.Since(begin).Seconds())
 	}(time.Now())
 
-	return s.Service.Register(username, password, email)
+	return s.Service.Register(username, password, email, first, last)
 }
 
 func (s *instrumentingService) PostUser(user users.User) (string, error) {
