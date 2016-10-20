@@ -148,6 +148,17 @@ func (mw loggingMiddleware) Delete(entity, id string) (err error) {
 	return mw.next.Delete(entity, id)
 }
 
+func (mw loggingMiddleware) Health() (health []Health) {
+	defer func(begin time.Time) {
+		mw.logger.Log(
+			"method", "Health",
+			"result", len(health),
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+	return mw.next.Health()
+}
+
 type instrumentingService struct {
 	requestCount   metrics.Counter
 	requestLatency metrics.Histogram
@@ -242,4 +253,13 @@ func (s *instrumentingService) Delete(entity, id string) error {
 	}(time.Now())
 
 	return s.Service.Delete(entity, id)
+}
+
+func (s *instrumentingService) Health() []Health {
+	defer func(begin time.Time) {
+		s.requestCount.With("method", "health").Add(1)
+		s.requestLatency.With("method", "health").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	return s.Service.Health()
 }

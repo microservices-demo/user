@@ -5,8 +5,6 @@ package api
 // transport.
 
 import (
-	"time"
-
 	"github.com/go-kit/kit/endpoint"
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/users"
@@ -163,7 +161,8 @@ func MakeDeleteEndpoint(s Service) endpoint.Endpoint {
 // MakeHealthEndpoint returns current health of the given service.
 func MakeHealthEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		return healthResponse{Status: "OK", Time: time.Now().String()}, nil
+		health := s.Health()
+		return healthResponse{Health: health}, nil
 	}
 }
 
@@ -229,8 +228,7 @@ type healthRequest struct {
 }
 
 type healthResponse struct {
-	Status string `json:"status"`
-	Time   string `json:"time"`
+	Health []Health `json:"health"`
 }
 
 type EmbedStruct struct {

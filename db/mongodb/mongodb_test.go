@@ -149,3 +149,12 @@ func TestGetURL(t *testing.T) {
 		t.Error("expected url mismatch")
 	}
 }
+
+func TestPing(t *testing.T) {
+	TestMongo.Session = TestServer.Session()
+	defer TestMongo.Session.Close()
+	err := TestMongo.Ping()
+	if err != nil {
+		t.Error(err)
+	}
+}

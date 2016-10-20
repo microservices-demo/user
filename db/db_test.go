@@ -93,6 +93,14 @@ func TestGetUserAttributes(t *testing.T) {
 	}
 }
 
+func TestPing(t *testing.T) {
+	err := Ping()
+	if err != ErrFakeError {
+		t.Error("expected fake db error from ping")
+	}
+
+}
+
 type fake struct{}
 
 func (f fake) Init() error {
@@ -143,5 +151,9 @@ func (f fake) CreateAddress(u *users.Address, id string) error {
 }
 
 func (f fake) Delete(entity, id string) error {
+	return ErrFakeError
+}
+
+func (f fake) Ping() error {
 	return ErrFakeError
 }
