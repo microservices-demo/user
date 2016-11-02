@@ -133,8 +133,12 @@ func TestGetUserByName(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	TestMongo.Session = TestServer.Session()
 	defer TestMongo.Session.Close()
-
+	_, err := TestMongo.GetUser("1")
+	if err != nil {
+		t.Error(err)
+	}
 }
+
 func TestGetUserAttributes(t *testing.T) {
 	TestMongo.Session = TestServer.Session()
 	defer TestMongo.Session.Close()
@@ -147,5 +151,14 @@ func TestGetURL(t *testing.T) {
 	u := getURL()
 	if u.String() != "mongodb://test:password@thishostshouldnotexist:3038/users" {
 		t.Error("expected url mismatch")
+	}
+}
+
+func TestPing(t *testing.T) {
+	TestMongo.Session = TestServer.Session()
+	defer TestMongo.Session.Close()
+	err := TestMongo.Ping()
+	if err != nil {
+		t.Error(err)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/microservices-demo/user/users"
 
@@ -38,7 +39,7 @@ type Mongo struct {
 func (m *Mongo) Init() error {
 	u := getURL()
 	var err error
-	m.Session, err = mgo.Dial(u.String())
+	m.Session, err = mgo.DialWithTimeout(u.String(), time.Duration(5)*time.Second)
 	if err != nil {
 		return err
 	}
@@ -455,4 +456,10 @@ func (m *Mongo) EnsureIndexes() error {
 	}
 	c := s.DB("").C("customers")
 	return c.EnsureIndex(i)
+}
+
+func (m *Mongo) Ping() error {
+	s := m.Session.Copy()
+	defer s.Close()
+	return s.Ping()
 }

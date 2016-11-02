@@ -25,6 +25,7 @@ type Database interface {
 	GetCards() ([]users.Card, error)
 	Delete(string, string) error
 	CreateCard(*users.Card, string) error
+	Ping() error
 }
 
 var (
@@ -162,4 +163,9 @@ func GetCards() ([]users.Card, error) {
 //Delete invokes DefaultDb method
 func Delete(entity, id string) error {
 	return DefaultDb.Delete(entity, id)
+}
+
+//Ping invokes DefaultDB method
+func Ping() error {
+	return DefaultDb.Ping()
 }

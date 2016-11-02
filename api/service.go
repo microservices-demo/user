@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/users"
@@ -28,6 +29,7 @@ type Service interface {
 	GetCards(id string) ([]users.Card, error)
 	PostCard(u users.Card, userid string) (string, error)
 	Delete(entity, id string) error
+	Health() []Health // GET /health
 }
 
 // NewFixedService returns a simple implementation of the Service interface,
@@ -36,6 +38,12 @@ func NewFixedService() Service {
 }
 
 type fixedService struct{}
+
+type Health struct {
+	Service string `json:"service"`
+	Status  string `json:"status"`
+	Time    string `json:"time"`
+}
 
 func (s *fixedService) Login(username, password string) (users.User, error) {
 	u, err := db.GetUserByName(username)
@@ -123,6 +131,24 @@ func (s *fixedService) PostCard(card users.Card, userid string) (string, error) 
 
 func (s *fixedService) Delete(entity, id string) error {
 	return db.Delete(entity, id)
+}
+
+func (s *fixedService) Health() []Health {
+	var health []Health
+	dbstatus := "OK"
+
+	err := db.Ping()
+	if err != nil {
+		dbstatus = "err"
+	}
+
+	app := Health{"user", "OK", time.Now().String()}
+	db := Health{"user-db", dbstatus, time.Now().String()}
+
+	health = append(health, app)
+	health = append(health, db)
+
+	return health
 }
 
 func calculatePassHash(pass, salt string) string {
