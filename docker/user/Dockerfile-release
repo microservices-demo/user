@@ -1,4 +1,8 @@
-FROM busybox:1
+FROM alpine:3.4
+
+RUN addgroup mygroup && adduser -D -G mygroup myuser
+RUN apk add --update libcap
+
 ENV HATEAOS user
 ENV USER_DATABASE mongodb
 ENV MONGO_HOST user-db
@@ -6,5 +10,8 @@ ENV MONGO_HOST user-db
 WORKDIR /
 EXPOSE 80
 COPY bin/user /
+
+RUN setcap 'cap_net_bind_service=+ep' /user
+USER myuser
 
 CMD ["/user", "-port=80"]
