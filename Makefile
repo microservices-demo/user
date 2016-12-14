@@ -85,6 +85,6 @@ clean: cleandocker
 	rm -rf docker/user/bin
 	rm -rf vendor
 
-build: 
-	mkdir -p bin 
+build: deps
+	mkdir -p bin
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/$(INSTANCE) main.go

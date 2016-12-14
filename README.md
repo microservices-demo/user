@@ -6,33 +6,73 @@
 
 This service covers user account storage, to include cards and addresses
 
-##Build
-To build a local testing version:
+## Build
 
+### Go
+
+```bash
+make build
+```
+
+### Docker
+
+```bash
+make dockerdev
+```
+
+## Test
+
+```bash
+make test
+
+```
+
+## Run
 
 ```bash
 make dockerruntest
-
 ```
 
-To stop 
+## Check
 
 ```bash
-make clean
-
+chromium-browser http://localhost:8084/health
 ```
 
-Accessible at localhost:8084
+## Use
 
-##Endpoints
-/customers
+Test user account passwords can be found in the comments in `users-db-test/scripts/customer-insert.js`
 
-/cards
+### Customers
 
-/addresses
+```bash
+chromium-browser http://localhost:8084/customers
+```
 
-/login
+### Cards
+```bash
+chromium-browser http://localhost:8084/cards
+```
 
-/register
+### Addresses
 
-Test user account passwords can be found in the comments in users-db-test/scripts/customer-insert.js
+```bash
+chromium-browser http://localhost:8084/addresses
+```
+
+### Login
+```bash
+chromium-browser http://localhost:8084/login
+```
+
+### Register
+
+```bash
+chromium-browser http://localhost:8084/register
+```
+
+## Push
+
+```bash
+make dockertravisbuild
+```
