@@ -6,37 +6,46 @@
 
 This service covers user account storage, to include cards and addresses
 
-## Build
+## Bugs, Feature Requests and Contributing
+We'd love to see community contributions. We like to keep it simple and use Github issues to track bugs and feature requests and pull requests to manage contributions.
 
-### Go
+>## Build
+
+### Using Go natively
 
 ```bash
 make build
 ```
 
-### Docker
+### Using Docker Compose
 
 ```bash
-make dockerdev
+docker-compose build
 ```
 
 ## Test
 
 ```bash
 make test
-
 ```
 
 ## Run
 
+### Natively
 ```bash
-make dockerruntest
+docker-compose up -d user-db
+./bin/user -port=8080 -database=mongodb -mongo-host=localhost:27017
+```
+
+### Using Docker Compose
+```bash
+docker-compose up
 ```
 
 ## Check
 
 ```bash
-chromium-browser http://localhost:8084/health
+curl http://localhost:8080/health
 ```
 
 ## Use
@@ -46,29 +55,29 @@ Test user account passwords can be found in the comments in `users-db-test/scrip
 ### Customers
 
 ```bash
-chromium-browser http://localhost:8084/customers
+curl http://localhost:8080/customers
 ```
 
 ### Cards
 ```bash
-chromium-browser http://localhost:8084/cards
+curl http://localhost:8080/cards
 ```
 
 ### Addresses
 
 ```bash
-chromium-browser http://localhost:8084/addresses
+curl http://localhost:8080/addresses
 ```
 
 ### Login
 ```bash
-chromium-browser http://localhost:8084/login
+curl http://localhost:8080/login
 ```
 
 ### Register
 
 ```bash
-chromium-browser http://localhost:8084/register
+curl http://localhost:8080/register
 ```
 
 ## Push
