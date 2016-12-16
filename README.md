@@ -23,13 +23,13 @@ make build
 docker-compose build
 ```
 
-## Test
+>## Test
 
 ```bash
 make test
 ```
 
-## Run
+>## Run
 
 ### Natively
 ```bash
@@ -42,13 +42,13 @@ docker-compose up -d user-db
 docker-compose up
 ```
 
-## Check
+>## Check
 
 ```bash
 curl http://localhost:8080/health
 ```
 
-## Use
+>## Use
 
 Test user account passwords can be found in the comments in `users-db-test/scripts/customer-insert.js`
 
