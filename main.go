@@ -15,15 +15,26 @@ import (
 	"github.com/microservices-demo/user/api"
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/db/mongodb"
+	stdopentracing "github.com/opentracing/opentracing-go"
+	zipkin "github.com/openzipkin/zipkin-go-opentracing"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/net/context"
 )
 
-var dev bool
-var port string
-var acc string
+var (
+	dev  bool
+	port string
+	acc  string
+	zip  string
+)
+
+const (
+	ServiceName = "user"
+)
 
 func init() {
+
+	flag.StringVar(&zip, "zipkin", "", "Enable Zipkin tracing via a Kafka server host:port")
 	flag.StringVar(&port, "port", "8084", "Port on which to run")
 	db.Register("mongodb", &mongodb.Mongo{})
 }
@@ -42,6 +53,26 @@ func main() {
 		logger = log.NewContext(logger).With("ts", log.DefaultTimestampUTC)
 		logger = log.NewContext(logger).With("caller", log.DefaultCaller)
 	}
+
+	logger = log.NewContext(logger).With("tracer", "Zipkin")
+	logger.Log("addr", zip)
+	collector, err := zipkin.NewHTTPCollector(
+		zip,
+		zipkin.HTTPLogger(logger),
+	)
+	if err != nil {
+		logger.Log("err", err)
+		os.Exit(1)
+	}
+	var tracer stdopentracing.Tracer
+	tracer, err = zipkin.NewTracer(
+		zipkin.NewRecorder(collector, false, fmt.Sprintf(":%v", port), ServiceName),
+	)
+	if err != nil {
+		logger.Log("err", err)
+		os.Exit(1)
+	}
+
 	dbconn := false
 	for !dbconn {
 		err := db.Init()
@@ -86,7 +117,7 @@ func main() {
 	// Create and launch the HTTP server.
 	go func() {
 		logger.Log("transport", "HTTP", "port", port)
-		handler := api.MakeHTTPHandler(ctx, endpoints, logger)
+		handler := api.MakeHTTPHandler(ctx, endpoints, logger, tracer)
 		errc <- http.ListenAndServe(fmt.Sprintf(":%v", port), handler)
 	}()
 
