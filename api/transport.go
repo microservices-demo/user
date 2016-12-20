@@ -54,7 +54,7 @@ func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger, tracer
 		e.UserGetEndpoint,
 		decodeGetRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "GetCustomers", logger)))...,
+		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "GET /customer", logger)))...,
 	))
 	r.Methods("GET").PathPrefix("/cards").Handler(httptransport.NewServer(
 		ctx,

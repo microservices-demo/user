@@ -6,8 +6,10 @@ package api
 
 import (
 	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/tracing/opentracing"
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/users"
+	stdopentracing "github.com/opentracing/opentracing-go"
 	"golang.org/x/net/context"
 )
 
@@ -27,12 +29,12 @@ type Endpoints struct {
 
 // MakeEndpoints returns an Endpoints structure, where each endpoint is
 // backed by the given service.
-func MakeEndpoints(s Service) Endpoints {
+func MakeEndpoints(s Service, tracer stdopentracing.Tracer) Endpoints {
 	return Endpoints{
 		LoginEndpoint:       MakeLoginEndpoint(s),
 		RegisterEndpoint:    MakeRegisterEndpoint(s),
 		HealthEndpoint:      MakeHealthEndpoint(s),
-		UserGetEndpoint:     MakeUserGetEndpoint(s),
+		UserGetEndpoint:     opentracing.TraceServer(tracer, "GET /customer")(MakeUserGetEndpoint(s)),
 		UserPostEndpoint:    MakeUserPostEndpoint(s),
 		AddressGetEndpoint:  MakeAddressGetEndpoint(s),
 		AddressPostEndpoint: MakeAddressPostEndpoint(s),
@@ -63,6 +65,11 @@ func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 // MakeUserGetEndpoint returns an endpoint via the given service.
 func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		span := stdopentracing.SpanFromContext(ctx)
+		span.SetTag("service", "user")
+		resourceSpan := stdopentracing.StartSpan("listing users", stdopentracing.ChildOf(span.Context()))
+		defer resourceSpan.Finish()
+
 		req := request.(GetRequest)
 		usrs, err := s.GetUsers(req.ID)
 		if req.ID == "" {
