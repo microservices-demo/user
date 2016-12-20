@@ -65,13 +65,16 @@ func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 // MakeUserGetEndpoint returns an endpoint via the given service.
 func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		span := stdopentracing.SpanFromContext(ctx)
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "get users")
 		span.SetTag("service", "user")
-		resourceSpan := stdopentracing.StartSpan("listing users", stdopentracing.ChildOf(span.Context()))
-		defer resourceSpan.Finish()
+		defer span.Finish()
 
 		req := request.(GetRequest)
+
+		userspan := stdopentracing.StartSpan("users from db", stdopentracing.ChildOf(span.Context()))
 		usrs, err := s.GetUsers(req.ID)
+		userspan.Finish()
 		if req.ID == "" {
 			return EmbedStruct{usersResponse{Users: usrs}}, err
 		}
@@ -85,7 +88,9 @@ func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 			return users.User{}, err
 		}
 		user := usrs[0]
+		attrspan := stdopentracing.StartSpan("attributes from db", stdopentracing.ChildOf(span.Context()))
 		db.GetUserAttributes(&user)
+		attrspan.Finish()
 		if req.Attr == "addresses" {
 			return EmbedStruct{addressesResponse{Addresses: user.Addresses}}, err
 		}

@@ -54,25 +54,27 @@ func main() {
 		logger = log.NewContext(logger).With("caller", log.DefaultCaller)
 	}
 
-	logger = log.NewContext(logger).With("tracer", "Zipkin")
-	logger.Log("addr", zip)
-	collector, err := zipkin.NewHTTPCollector(
-		zip,
-		zipkin.HTTPLogger(logger),
-	)
-	if err != nil {
-		logger.Log("err", err)
-		os.Exit(1)
-	}
 	var tracer stdopentracing.Tracer
-	tracer, err = zipkin.NewTracer(
-		zipkin.NewRecorder(collector, false, fmt.Sprintf("localhost:%v", port), ServiceName),
-	)
-	if err != nil {
-		logger.Log("err", err)
-		os.Exit(1)
+	{
+		logger := log.NewContext(logger).With("tracer", "Zipkin")
+		logger.Log("addr", zip)
+		collector, err := zipkin.NewHTTPCollector(
+			zip,
+			zipkin.HTTPLogger(logger),
+		)
+		if err != nil {
+			logger.Log("err", err)
+			os.Exit(1)
+		}
+		tracer, err = zipkin.NewTracer(
+			zipkin.NewRecorder(collector, false, fmt.Sprintf("localhost:%v", port), ServiceName),
+		)
+		if err != nil {
+			logger.Log("err", err)
+			os.Exit(1)
+		}
+		stdopentracing.InitGlobalTracer(tracer)
 	}
-	stdopentracing.InitGlobalTracer(tracer)
 	dbconn := false
 	for !dbconn {
 		err := db.Init()
