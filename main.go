@@ -34,7 +34,7 @@ const (
 
 func init() {
 
-	flag.StringVar(&zip, "zipkin", "", "Enable Zipkin tracing via a Kafka server host:port")
+	flag.StringVar(&zip, "zipkin", "", "Zipkin address")
 	flag.StringVar(&port, "port", "8084", "Port on which to run")
 	db.Register("mongodb", &mongodb.Mongo{})
 }
@@ -66,13 +66,13 @@ func main() {
 	}
 	var tracer stdopentracing.Tracer
 	tracer, err = zipkin.NewTracer(
-		zipkin.NewRecorder(collector, false, fmt.Sprintf(":%v", port), ServiceName),
+		zipkin.NewRecorder(collector, false, fmt.Sprintf("localhost:%v", port), ServiceName),
 	)
 	if err != nil {
 		logger.Log("err", err)
 		os.Exit(1)
 	}
-
+	stdopentracing.InitGlobalTracer(tracer)
 	dbconn := false
 	for !dbconn {
 		err := db.Init()
@@ -112,7 +112,7 @@ func main() {
 	}
 
 	// Endpoint domain.
-	endpoints := api.MakeEndpoints(service)
+	endpoints := api.MakeEndpoints(service, tracer)
 
 	// Create and launch the HTTP server.
 	go func() {
