@@ -34,7 +34,7 @@ const (
 
 func init() {
 
-	flag.StringVar(&zip, "zipkin", "", "Zipkin address")
+	flag.StringVar(&zip, "zipkin", os.Getenv("ZIPKIN"), "Zipkin address")
 	flag.StringVar(&port, "port", "8084", "Port on which to run")
 	db.Register("mongodb", &mongodb.Mongo{})
 }
