@@ -134,7 +134,7 @@ func TestGetUserByName(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	TestMongo.Session = TestServer.Session()
 	defer TestMongo.Session.Close()
-	_, err := TestMongo.GetUser("1")
+	_, err := TestMongo.GetUser(TestUser.UserID)
 	if err != nil {
 		t.Error(err)
 	}
