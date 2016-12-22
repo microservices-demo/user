@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/microservices-demo/user/users"
@@ -33,13 +34,13 @@ func TestMain(m *testing.M) {
 	TestMongo.Session = TestServer.Session()
 	TestMongo.EnsureIndexes()
 	TestMongo.Session.Close()
-	defer exitTest()
-	m.Run()
+	exitTest(m.Run())
 }
 
-func exitTest() {
+func exitTest(i int) {
 	TestServer.Wipe()
 	TestServer.Stop()
+	os.Exit(i)
 }
 
 func TestInit(t *testing.T) {
@@ -133,7 +134,7 @@ func TestGetUserByName(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	TestMongo.Session = TestServer.Session()
 	defer TestMongo.Session.Close()
-	_, err := TestMongo.GetUser("1")
+	_, err := TestMongo.GetUser(TestUser.UserID)
 	if err != nil {
 		t.Error(err)
 	}
