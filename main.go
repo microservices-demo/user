@@ -56,22 +56,26 @@ func main() {
 
 	var tracer stdopentracing.Tracer
 	{
-		logger := log.NewContext(logger).With("tracer", "Zipkin")
-		logger.Log("addr", zip)
-		collector, err := zipkin.NewHTTPCollector(
-			zip,
-			zipkin.HTTPLogger(logger),
-		)
-		if err != nil {
-			logger.Log("err", err)
-			os.Exit(1)
-		}
-		tracer, err = zipkin.NewTracer(
-			zipkin.NewRecorder(collector, false, fmt.Sprintf("localhost:%v", port), ServiceName),
-		)
-		if err != nil {
-			logger.Log("err", err)
-			os.Exit(1)
+		if zip == "" {
+			tracer = stdopentracing.NoopTracer{}
+		} else {
+			logger := log.NewContext(logger).With("tracer", "Zipkin")
+			logger.Log("addr", zip)
+			collector, err := zipkin.NewHTTPCollector(
+				zip,
+				zipkin.HTTPLogger(logger),
+			)
+			if err != nil {
+				logger.Log("err", err)
+				os.Exit(1)
+			}
+			tracer, err = zipkin.NewTracer(
+				zipkin.NewRecorder(collector, false, fmt.Sprintf("localhost:%v", port), ServiceName),
+			)
+			if err != nil {
+				logger.Log("err", err)
+				os.Exit(1)
+			}
 		}
 		stdopentracing.InitGlobalTracer(tracer)
 	}
