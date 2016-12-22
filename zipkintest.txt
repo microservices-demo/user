@@ -2,6 +2,7 @@ To see the data put into Zipkin do the following
 
 At the root of the directory run:
 
+make
 docker-compose -f docker-compose-zipkin.yml build
 docker-compose -f docker-compose-zipkin.yml up
 
