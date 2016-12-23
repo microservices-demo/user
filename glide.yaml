@@ -6,8 +6,11 @@ import:
   - log
   - metrics
   - metrics/prometheus
+  - tracing/opentracing
   - transport/http
 - package: github.com/gorilla/mux
+- package: github.com/opentracing/opentracing-go
+- package: github.com/openzipkin/zipkin-go-opentracing
 - package: github.com/prometheus/client_golang
   subpackages:
   - prometheus
@@ -19,4 +22,3 @@ import:
   subpackages:
   - bson
 - package: gopkg.in/tomb.v2
-
