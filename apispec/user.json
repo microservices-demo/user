@@ -447,7 +447,7 @@
             }
          },
          "required":[
-            "_embedded",
+            "_embedded"
          ]
       },
       "Statusresponse":{
@@ -536,7 +536,7 @@
                },
                "required":[
                   "self",
-                  "customer",
+                  "customer"
                ]
             }
          },
