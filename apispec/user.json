@@ -148,7 +148,7 @@
       "/customers/{id}/cards":{
          "get":{
             "description":"Returns a customer",
-            "operationId":"Get customer",
+            "operationId":"Get customer cards",
             "produces":[
                "application/json;charset=UTF-8"
             ],
@@ -174,8 +174,8 @@
       },
       "/customers/{id}/addresses":{
          "get":{
-            "description":"Returns a customer",
-            "operationId":"Get customer",
+            "description":"Returns an address",
+            "operationId":"Get customer addresses",
             "produces":[
                "application/json;charset=UTF-8"
             ],
@@ -447,7 +447,7 @@
             }
          },
          "required":[
-            "_embedded"
+            "_embedded",
          ]
       },
       "Statusresponse":{
@@ -536,7 +536,7 @@
                },
                "required":[
                   "self",
-                  "customer"
+                  "customer",
                ]
             }
          },
@@ -731,29 +731,26 @@
          "title":"Post Address",
          "type":"object",
          "properties":{
-	  "street":{
-	     "type":"string"
-	  },
-	  "number":{
-	     "type":"string"
-	  },
-	  "country":{
-	     "type":"string"
-	  },
-	  "city":{
-	     "type":"string"
-	  },
-	  "postcode":{
-	     "type":"string"
-	  },
+      	  "street":{
+      	     "type":"string"
+      	  },
+      	  "number":{
+      	     "type":"string"
+      	  },
+      	  "country":{
+      	     "type":"string"
+      	  },
+      	  "city":{
+      	     "type":"string"
+      	  },
+      	  "postcode":{
+      	     "type":"string"
+      	  },
             "userID":{
                "description":"User to attach this card to.",
                "type":"string"
             }
-         },
-         "required":[
-            "address"
-         ]
+         } 
       }
    }
 }
