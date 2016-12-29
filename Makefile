@@ -20,7 +20,8 @@ rm-deps:
 	rm -rf vendor
 
 test:
-	@glide novendor|xargs go test -v
+	@docker build -t $(INSTANCE)-test -f ./Dockerfile-test .
+	@docker run --rm -it $(INSTANCE)-test /bin/sh -c 'glide novendor| xargs go test -v'
 
 cover:
 	@glide novendor|xargs go test -v -covermode=count
