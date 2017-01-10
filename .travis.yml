@@ -16,22 +16,6 @@ after_success:
 - go get -v github.com/mattn/goveralls
 - goveralls -coverprofile=cover.profile -service=travis-ci
 - make dockertravisbuild
-before_install:
-- openssl aes-256-cbc -K $encrypted_7c540e2aa1cb_key -iv $encrypted_7c540e2aa1cb_iv
-  -in user_deploy_rsa.enc -out user_deploy_rsa -d
-addons:
-  ssh_known_hosts: "$BASTION"
-before_deploy:
-- eval "$(ssh-agent -s)"
-- chmod 600 $TRAVIS_BUILD_DIR/user_deploy_rsa
-- ssh-add $TRAVIS_BUILD_DIR/user_deploy_rsa
-deploy:
-  provider: script
-  skip_cleanup: true
-  script: ssh -o StrictHostKeyChecking=no ${BASTION_USER}@${BASTION} ./deploy.sh user
-    $COMMIT
-  on:
-    branch: master
 notifications:
   slack:
     secure: SRC7z+gqHO4oNFxZgxkPuLKlt5v8QnbgV8mzRIDbaCqyryCLqphD+dKRqF9Ou4gTJthF0++FrJcjso8dbKY1PjRqmNRNJBaeCAnXL34UDq6LQIULchcQjvZZjcNPIXObVrxsT1xd7qg354KtPbt9UsmcuvTiwGw1lsRsDRtB/c6OjCgA85b0QR3LYjL66kZogZew13J7Od/EgLXJqv+Ir9GL69jKpQ1Zu7pI9OXPX8R8PMNbjr6SbhnpkudTd9tipfUL+QsHaf18wuXRH44jOk7DCOWENLhimLYcxUPHSNItxvCH74ci4y5XyPCdfjX6N5x5aiv12SpE/150Cb9mZKbXETBxty8LD4doK8WuL/ov3ViMb15e1tVkrz050yyEHdNm1KzsqoMgxRWwnWstCj+fonsl2QRGsB63j2hEW4w+xm38vZcmaYJSMoZVXYEOl/LQxVHhIHP4jwm9tvwPihm4GjH4e5kwY5kEm7PFKXP2nScVSll2n3LMMd8dVW0J8ijlpt+Dl36CM9HI/2Q0stQeHEA88cQ2bGi8Q2GwUqFd13HnTyBuoS877tb2X/RMbv1wows2ZNeS0IXiLbEOata8yO4CHM17k978pmEKh29XDQtYcP5L5q0kBXj8w4EYGA6kJM9GVMwiqpjHFJnKhbr5OGJMGxg+EYF6E3XLrlo=
