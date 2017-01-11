@@ -9,6 +9,10 @@ This service covers user account storage, to include cards and addresses
 ## Bugs, Feature Requests and Contributing
 We'd love to see community contributions. We like to keep it simple and use Github issues to track bugs and feature requests and pull requests to manage contributions.
 
+>## API Spec
+
+Checkout the API Spec [here](http://microservices-demo.github.io/api/index?url=https://raw.githubusercontent.com/microservices-demo/user/master/apispec/user.json)
+
 >## Build
 
 ### Using Go natively
