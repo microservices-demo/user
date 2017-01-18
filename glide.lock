@@ -1,8 +1,14 @@
-hash: 4ee4713d6c89f9f5c8bb53a9d7eda94c14d69ebc70a0f30f48801c416e002740
-updated: 2016-12-22T08:28:36.69998899+01:00
+hash: 32956a03ce39fe62b3bceebd8e22e79651fd3f735597be654e8729ccd731284f
+updated: 2017-01-17T17:20:40.444795777-08:00
 imports:
+- name: github.com/afex/hystrix-go
+  version: 39520ddd07a9d9a071d615f7476798659f5a3b89
+  subpackages:
+  - hystrix
+  - hystrix/metric_collector
+  - hystrix/rolling
 - name: github.com/apache/thrift
-  version: 0c27352179e0463bde1f68757f2d77e3c222f530
+  version: e0ccbd6e62e14f32d7c5fe0f9cec6eff3259b863
   subpackages:
   - lib/go/thrift
 - name: github.com/beorn7/perks
@@ -10,7 +16,7 @@ imports:
   subpackages:
   - quantile
 - name: github.com/davecgh/go-spew
-  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
   subpackages:
   - spew
 - name: github.com/eapache/go-resiliency
@@ -24,6 +30,7 @@ imports:
 - name: github.com/go-kit/kit
   version: 988c05d06d8ee3a9c13782f0e49b2c6e4726388d
   subpackages:
+  - circuitbreaker
   - endpoint
   - log
   - metrics
@@ -36,7 +43,7 @@ imports:
 - name: github.com/go-stack/stack
   version: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
 - name: github.com/gogo/protobuf
-  version: 06ec6c31ff1bac6ed4e205a547a3d72934813ef3
+  version: f9114dace7bd920b32f943b3c73fafbcbab2bf31
   subpackages:
   - proto
 - name: github.com/golang/protobuf
@@ -58,12 +65,12 @@ imports:
   subpackages:
   - pbutil
 - name: github.com/opentracing/opentracing-go
-  version: 0c3154a3c2ce79d3271985848659870599dfb77c
+  version: 5e5abf838007b08f96ae057bc182636a178da0b9
   subpackages:
   - ext
   - log
 - name: github.com/openzipkin/zipkin-go-opentracing
-  version: e877b8e9d1069eaedfe4f27e9b6a51cfe20073c9
+  version: 594640b9ef7e5c994e8d9499359d693c032d738c
   subpackages:
   - _thrift/gen-go/scribe
   - _thrift/gen-go/zipkincore
@@ -96,20 +103,27 @@ imports:
 - name: github.com/rcrowley/go-metrics
   version: 1f30fe9094a513ce4c700b9a54458bbb0c96996c
 - name: github.com/Shopify/sarama
-  version: 9418d7c7189af6ea2df537692f9428efe1368368
+  version: 0fb560e5f7fbcaee2f75e3c34174320709f69944
+- name: github.com/sony/gobreaker
+  version: 809bcd5a528f344e95c2368796c9225d128f9b3e
+- name: github.com/streadway/handy
+  version: f450267a206e480d863d2a92846a40f6e2896b2a
+  subpackages:
+  - breaker
 - name: golang.org/x/net
   version: 7394c112eae4dba7e96bfcfe738e6373d61772b4
   subpackages:
   - context
   - context/ctxhttp
 - name: google.golang.org/grpc
-  version: 09aecb094ef6b9ebe49dd999f52c505beeeb402e
+  version: 50955793b0183f9de69bd78e2ec251cf20aab121
   subpackages:
   - metadata
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
   - bson
+  - dbtest
   - internal/json
   - internal/sasl
   - internal/scram

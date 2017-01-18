@@ -8,6 +8,7 @@ import:
   - metrics/prometheus
   - tracing/opentracing
   - transport/http
+  - circuitbreaker
 - package: github.com/gorilla/mux
 - package: github.com/opentracing/opentracing-go
 - package: github.com/openzipkin/zipkin-go-opentracing
@@ -22,3 +23,6 @@ import:
   subpackages:
   - bson
 - package: gopkg.in/tomb.v2
+- package: github.com/afex/hystrix-go
+  subpackages:
+  - hystrix
