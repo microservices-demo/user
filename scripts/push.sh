@@ -40,12 +40,9 @@ tag_and_push_all() {
     done;
 }
 
-# Always push commit
-tag_and_push_all $COMMIT
-
 # Push snapshot when in master
-if [ "$TRAVIS_BRANCH" == "master" ]; then
-    tag_and_push_all snapshot
+if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    tag_and_push_all master-${COMMIT:0:8}
 fi;
 
 # Push tag and latest when tagged
