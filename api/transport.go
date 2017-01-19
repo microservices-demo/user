@@ -9,9 +9,11 @@ import (
 	"net/http"
 	"strings"
 
+        //"github.com/afex/hystrix-go/hystrix"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/tracing/opentracing"
 	httptransport "github.com/go-kit/kit/transport/http"
+	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/gorilla/mux"
 	"github.com/microservices-demo/user/users"
 	stdopentracing "github.com/opentracing/opentracing-go"
@@ -37,70 +39,70 @@ func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger, tracer
 
 	r.Methods("GET").Path("/login").Handler(httptransport.NewServer(
 		ctx,
-		e.LoginEndpoint,
+		circuitbreaker.Hystrix("Login")(e.LoginEndpoint),
 		decodeLoginRequest,
 		encodeResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "GET /login", logger)))...,
 	))
 	r.Methods("POST").Path("/register").Handler(httptransport.NewServer(
 		ctx,
-		e.RegisterEndpoint,
+		circuitbreaker.Hystrix("Register")(e.RegisterEndpoint),
 		decodeRegisterRequest,
 		encodeResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "POST /register", logger)))...,
 	))
 	r.Methods("GET").PathPrefix("/customers").Handler(httptransport.NewServer(
 		ctx,
-		e.UserGetEndpoint,
+		circuitbreaker.Hystrix("UserGet")(e.UserGetEndpoint),
 		decodeGetRequest,
 		encodeResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "GET /customers", logger)))...,
 	))
 	r.Methods("GET").PathPrefix("/cards").Handler(httptransport.NewServer(
 		ctx,
-		e.CardGetEndpoint,
+		circuitbreaker.Hystrix("CardGet")(e.CardGetEndpoint),
 		decodeGetRequest,
 		encodeResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "GET /cards", logger)))...,
 	))
 	r.Methods("GET").PathPrefix("/addresses").Handler(httptransport.NewServer(
 		ctx,
-		e.AddressGetEndpoint,
+		circuitbreaker.Hystrix("AddressGet")(e.AddressGetEndpoint),
 		decodeGetRequest,
 		encodeResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "GET /addresses", logger)))...,
 	))
 	r.Methods("POST").Path("/customers").Handler(httptransport.NewServer(
 		ctx,
-		e.UserPostEndpoint,
+		circuitbreaker.Hystrix("UserPost")(e.UserPostEndpoint),
 		decodeUserRequest,
 		encodeResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "POST /customers", logger)))...,
 	))
 	r.Methods("POST").Path("/addresses").Handler(httptransport.NewServer(
 		ctx,
-		e.AddressPostEndpoint,
+		circuitbreaker.Hystrix("AddressPost")(e.AddressPostEndpoint),
 		decodeAddressRequest,
 		encodeResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "POST /addresses", logger)))...,
 	))
 	r.Methods("POST").Path("/cards").Handler(httptransport.NewServer(
 		ctx,
-		e.CardPostEndpoint,
+		circuitbreaker.Hystrix("CardPost")(e.CardPostEndpoint),
 		decodeCardRequest,
 		encodeResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "POST /cards", logger)))...,
 	))
 	r.Methods("DELETE").PathPrefix("/").Handler(httptransport.NewServer(
 		ctx,
-		e.DeleteEndpoint,
+		circuitbreaker.Hystrix("Delete")(e.DeleteEndpoint),
 		decodeDeleteRequest,
 		encodeResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "DELETE /", logger)))...,
 	))
 	r.Methods("GET").PathPrefix("/health").Handler(httptransport.NewServer(
 		ctx,
-		e.HealthEndpoint,
+		circuitbreaker.Hystrix("Health")(e.HealthEndpoint),
 		decodeHealthRequest,
 		encodeHealthResponse,
 		append(options, httptransport.ServerBefore(opentracing.FromHTTPRequest(tracer, "GET /health", logger)))...,

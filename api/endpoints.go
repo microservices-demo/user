@@ -6,13 +6,11 @@ package api
 
 import (
 	"github.com/go-kit/kit/endpoint"
-	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/go-kit/kit/tracing/opentracing"
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/users"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	"golang.org/x/net/context"
-	"github.com/afex/hystrix-go/hystrix"
 )
 
 // Endpoints collects the endpoints that comprise the Service.
@@ -48,216 +46,176 @@ func MakeEndpoints(s Service, tracer stdopentracing.Tracer) Endpoints {
 
 // MakeLoginEndpoint returns an endpoint via the given service.
 func MakeLoginEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("Login", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("Login")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "login user")
-			span.SetTag("service", "user")
-			defer span.Finish()
-			req := request.(loginRequest)
-			u, err := s.Login(req.Username, req.Password)
-			return userResponse{User: u}, err
-	})
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "login user")
+		span.SetTag("service", "user")
+		defer span.Finish()
+		req := request.(loginRequest)
+		u, err := s.Login(req.Username, req.Password)
+		return userResponse{User: u}, err
+	}
 }
 
 // MakeRegisterEndpoint returns an endpoint via the given service.
 func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("Register", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("Register")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "register user")
-			span.SetTag("service", "user")
-			defer span.Finish()
-			req := request.(registerRequest)
-			id, err := s.Register(req.Username, req.Password, req.Email, req.FirstName, req.LastName)
-			return postResponse{ID: id}, err
-	})
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "register user")
+		span.SetTag("service", "user")
+		defer span.Finish()
+		req := request.(registerRequest)
+		id, err := s.Register(req.Username, req.Password, req.Email, req.FirstName, req.LastName)
+		return postResponse{ID: id}, err
+	}
 }
 
 // MakeUserGetEndpoint returns an endpoint via the given service.
 func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("UserGet", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("UserGet")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "get users")
-			span.SetTag("service", "user")
-			defer span.Finish()
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "get users")
+		span.SetTag("service", "user")
+		defer span.Finish()
 
-			req := request.(GetRequest)
+		req := request.(GetRequest)
 
-			userspan := stdopentracing.StartSpan("users from db", stdopentracing.ChildOf(span.Context()))
-			usrs, err := s.GetUsers(req.ID)
-			userspan.Finish()
-			if req.ID == "" {
-				return EmbedStruct{usersResponse{Users: usrs}}, err
-			}
-			if len(usrs) == 0 {
-				if req.Attr == "addresses" {
-					return EmbedStruct{addressesResponse{Addresses: make([]users.Address, 0)}}, err
-				}
-				if req.Attr == "cards" {
-					return EmbedStruct{cardsResponse{Cards: make([]users.Card, 0)}}, err
-				}
-				return users.User{}, err
-			}
-			user := usrs[0]
-			attrspan := stdopentracing.StartSpan("attributes from db", stdopentracing.ChildOf(span.Context()))
-			db.GetUserAttributes(&user)
-			attrspan.Finish()
+		userspan := stdopentracing.StartSpan("users from db", stdopentracing.ChildOf(span.Context()))
+		usrs, err := s.GetUsers(req.ID)
+		userspan.Finish()
+		if req.ID == "" {
+			return EmbedStruct{usersResponse{Users: usrs}}, err
+		}
+		if len(usrs) == 0 {
 			if req.Attr == "addresses" {
-				return EmbedStruct{addressesResponse{Addresses: user.Addresses}}, err
+				return EmbedStruct{addressesResponse{Addresses: make([]users.Address, 0)}}, err
 			}
 			if req.Attr == "cards" {
-				return EmbedStruct{cardsResponse{Cards: user.Cards}}, err
+				return EmbedStruct{cardsResponse{Cards: make([]users.Card, 0)}}, err
 			}
-			return user, err
-	})
+			return users.User{}, err
+		}
+		user := usrs[0]
+		attrspan := stdopentracing.StartSpan("attributes from db", stdopentracing.ChildOf(span.Context()))
+		db.GetUserAttributes(&user)
+		attrspan.Finish()
+		if req.Attr == "addresses" {
+			return EmbedStruct{addressesResponse{Addresses: user.Addresses}}, err
+		}
+		if req.Attr == "cards" {
+			return EmbedStruct{cardsResponse{Cards: user.Cards}}, err
+		}
+		return user, err
+	}
 }
 
 // MakeUserPostEndpoint returns an endpoint via the given service.
 func MakeUserPostEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("UserPost", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("UserPost")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "post user")
-			span.SetTag("service", "user")
-			defer span.Finish()
-			req := request.(users.User)
-			id, err := s.PostUser(req)
-			return postResponse{ID: id}, err
-	})
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "post user")
+		span.SetTag("service", "user")
+		defer span.Finish()
+		req := request.(users.User)
+		id, err := s.PostUser(req)
+		return postResponse{ID: id}, err
+	}
 }
 
 // MakeAddressGetEndpoint returns an endpoint via the given service.
 func MakeAddressGetEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("AddressGet", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("AddressGet")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "get users")
-			span.SetTag("service", "user")
-			defer span.Finish()
-			req := request.(GetRequest)
-			addrspan := stdopentracing.StartSpan("addresses from db", stdopentracing.ChildOf(span.Context()))
-			adds, err := s.GetAddresses(req.ID)
-			addrspan.Finish()
-			if req.ID == "" {
-				return EmbedStruct{addressesResponse{Addresses: adds}}, err
-			}
-			if len(adds) == 0 {
-				return users.Address{}, err
-			}
-			return adds[0], err
-	})
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "get users")
+		span.SetTag("service", "user")
+		defer span.Finish()
+		req := request.(GetRequest)
+		addrspan := stdopentracing.StartSpan("addresses from db", stdopentracing.ChildOf(span.Context()))
+		adds, err := s.GetAddresses(req.ID)
+		addrspan.Finish()
+		if req.ID == "" {
+			return EmbedStruct{addressesResponse{Addresses: adds}}, err
+		}
+		if len(adds) == 0 {
+			return users.Address{}, err
+		}
+		return adds[0], err
+	}
 }
 
 // MakeAddressPostEndpoint returns an endpoint via the given service.
 func MakeAddressPostEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("AddressPost", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("AddressPost")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "post address")
-			span.SetTag("service", "user")
-			defer span.Finish()
-			req := request.(addressPostRequest)
-			id, err := s.PostAddress(req.Address, req.UserID)
-			return postResponse{ID: id}, err
-	})
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "post address")
+		span.SetTag("service", "user")
+		defer span.Finish()
+		req := request.(addressPostRequest)
+		id, err := s.PostAddress(req.Address, req.UserID)
+		return postResponse{ID: id}, err
+	}
 }
 
-// MakeCardGetEndpoint returns an endpoint via the given service.
+// MakeUserGetEndpoint returns an endpoint via the given service.
 func MakeCardGetEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("CardGet", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("CardGet")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "get cards")
-			span.SetTag("service", "user")
-			defer span.Finish()
-			req := request.(GetRequest)
-			cardspan := stdopentracing.StartSpan("addresses from db", stdopentracing.ChildOf(span.Context()))
-			cards, err := s.GetCards(req.ID)
-			cardspan.Finish()
-			if req.ID == "" {
-				return EmbedStruct{cardsResponse{Cards: cards}}, err
-			}
-			if len(cards) == 0 {
-				return users.Card{}, err
-			}
-			return cards[0], err
-	})
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "get cards")
+		span.SetTag("service", "user")
+		defer span.Finish()
+		req := request.(GetRequest)
+		cardspan := stdopentracing.StartSpan("addresses from db", stdopentracing.ChildOf(span.Context()))
+		cards, err := s.GetCards(req.ID)
+		cardspan.Finish()
+		if req.ID == "" {
+			return EmbedStruct{cardsResponse{Cards: cards}}, err
+		}
+		if len(cards) == 0 {
+			return users.Card{}, err
+		}
+		return cards[0], err
+	}
 }
 
 // MakeCardPostEndpoint returns an endpoint via the given service.
 func MakeCardPostEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("CardPost", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("CardPost")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "post card")
-			span.SetTag("service", "user")
-			defer span.Finish()
-			req := request.(cardPostRequest)
-			id, err := s.PostCard(req.Card, req.UserID)
-			return postResponse{ID: id}, err
-	})
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "post card")
+		span.SetTag("service", "user")
+		defer span.Finish()
+		req := request.(cardPostRequest)
+		id, err := s.PostCard(req.Card, req.UserID)
+		return postResponse{ID: id}, err
+	}
 }
 
-// MakeDeleteEndpoint returns an endpoint via the given service.
+// MakeLoginEndpoint returns an endpoint via the given service.
 func MakeDeleteEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("Delete", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("Delete")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "delete entity")
-			span.SetTag("service", "user")
-			defer span.Finish()
-			req := request.(deleteRequest)
-			err = s.Delete(req.Entity, req.ID)
-			if err == nil {
-				return statusResponse{Status: true}, err
-			}
-			return statusResponse{Status: false}, err
-	})
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "delete entity")
+		span.SetTag("service", "user")
+		defer span.Finish()
+		req := request.(deleteRequest)
+		err = s.Delete(req.Entity, req.ID)
+		if err == nil {
+			return statusResponse{Status: true}, err
+		}
+		return statusResponse{Status: false}, err
+	}
 }
 
 // MakeHealthEndpoint returns current health of the given service.
 func MakeHealthEndpoint(s Service) endpoint.Endpoint {
-	hystrix.ConfigureCommand("Health", hystrix.CommandConfig{
-		MaxConcurrentRequests: 100,
-	})
-	return circuitbreaker.Hystrix("Health")(
-		func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			var span stdopentracing.Span
-			span, ctx = stdopentracing.StartSpanFromContext(ctx, "health check")
-			span.SetTag("service", "user")
-			defer span.Finish()
-			health := s.Health()
-			return healthResponse{Health: health}, nil
-	})
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var span stdopentracing.Span
+		span, ctx = stdopentracing.StartSpanFromContext(ctx, "health check")
+		span.SetTag("service", "user")
+		defer span.Finish()
+		health := s.Health()
+		return healthResponse{Health: health}, nil
+	}
 }
 
 type GetRequest struct {
