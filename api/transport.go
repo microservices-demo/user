@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 
-        //"github.com/afex/hystrix-go/hystrix"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/tracing/opentracing"
 	httptransport "github.com/go-kit/kit/transport/http"
