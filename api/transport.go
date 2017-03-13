@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/tracing/opentracing"
 	httptransport "github.com/go-kit/kit/transport/http"
-	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/gorilla/mux"
 	"github.com/microservices-demo/user/users"
 	stdopentracing "github.com/opentracing/opentracing-go"
@@ -25,7 +25,7 @@ var (
 )
 
 // MakeHTTPHandler mounts the endpoints into a REST-y HTTP handler.
-func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger, tracer stdopentracing.Tracer) http.Handler {
+func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger, tracer stdopentracing.Tracer) *mux.Router {
 	r := mux.NewRouter().StrictSlash(false)
 	options := []httptransport.ServerOption{
 		httptransport.ServerErrorLogger(logger),

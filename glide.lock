@@ -1,5 +1,5 @@
-hash: 32956a03ce39fe62b3bceebd8e22e79651fd3f735597be654e8729ccd731284f
-updated: 2017-01-17T17:20:40.444795777-08:00
+hash: b6132ca44a02e5b84ad8f27e24283918ff7c566256ebd76fac73564646aec258
+updated: 2017-03-13T12:37:17.157991208Z
 imports:
 - name: github.com/afex/hystrix-go
   version: 39520ddd07a9d9a071d615f7476798659f5a3b89
@@ -27,6 +27,8 @@ imports:
   version: bb955e01b9346ac19dc29eb16586c90ded99a98c
 - name: github.com/eapache/queue
   version: 44cc805cf13205b55f69e14bcb69867d1ae92f98
+- name: github.com/felixge/httpsnoop
+  version: 287b56e9e314227d3113c7c6b434d31aec68089d
 - name: github.com/go-kit/kit
   version: 988c05d06d8ee3a9c13782f0e49b2c6e4726388d
   subpackages:

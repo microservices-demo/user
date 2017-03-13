@@ -15,6 +15,7 @@ import (
 	"github.com/microservices-demo/user/api"
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/db/mongodb"
+	"github.com/microservices-demo/user/middleware"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -120,10 +121,23 @@ func main() {
 	// Endpoint domain.
 	endpoints := api.MakeEndpoints(service, tracer)
 
+	// HTTP router
+	router := api.MakeHTTPHandler(ctx, endpoints, logger, tracer)
+
+	httpMiddleware := []middleware.Interface{
+		middleware.Instrument{
+			Duration:     middleware.HTTPLatency,
+			RouteMatcher: router,
+			Service:      ServiceName,
+		},
+	}
+
+	// Handler
+	handler := middleware.Merge(httpMiddleware...).Wrap(router)
+
 	// Create and launch the HTTP server.
 	go func() {
 		logger.Log("transport", "HTTP", "port", port)
-		handler := api.MakeHTTPHandler(ctx, endpoints, logger, tracer)
 		errc <- http.ListenAndServe(fmt.Sprintf(":%v", port), handler)
 	}()
 

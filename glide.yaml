@@ -26,3 +26,4 @@ import:
 - package: github.com/afex/hystrix-go
   subpackages:
   - hystrix
+- package: github.com/felixge/httpsnoop
