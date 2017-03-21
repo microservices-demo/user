@@ -15,18 +15,24 @@ import (
 	"github.com/microservices-demo/user/api"
 	"github.com/microservices-demo/user/db"
 	"github.com/microservices-demo/user/db/mongodb"
-	"github.com/microservices-demo/user/middleware"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	commonMiddleware "github.com/weaveworks/common/middleware"
 	"golang.org/x/net/context"
 )
 
 var (
-	dev  bool
 	port string
-	acc  string
 	zip  string
+)
+
+var (
+	HTTPLatency = stdprometheus.NewHistogramVec(stdprometheus.HistogramOpts{
+		Name:    "request_duration_seconds",
+		Help:    "Time (in seconds) spent serving HTTP requests.",
+		Buckets: stdprometheus.DefBuckets,
+	}, []string{"method", "route", "status_code", "isWS"})
 )
 
 const (
@@ -34,7 +40,7 @@ const (
 )
 
 func init() {
-
+	stdprometheus.MustRegister(HTTPLatency)
 	flag.StringVar(&zip, "zipkin", os.Getenv("ZIPKIN"), "Zipkin address")
 	flag.StringVar(&port, "port", "8084", "Port on which to run")
 	db.Register("mongodb", &mongodb.Mongo{})
@@ -124,16 +130,15 @@ func main() {
 	// HTTP router
 	router := api.MakeHTTPHandler(ctx, endpoints, logger, tracer)
 
-	httpMiddleware := []middleware.Interface{
-		middleware.Instrument{
-			Duration:     middleware.HTTPLatency,
+	httpMiddleware := []commonMiddleware.Interface{
+		commonMiddleware.Instrument{
+			Duration:     HTTPLatency,
 			RouteMatcher: router,
-			Service:      ServiceName,
 		},
 	}
 
 	// Handler
-	handler := middleware.Merge(httpMiddleware...).Wrap(router)
+	handler := commonMiddleware.Merge(httpMiddleware...).Wrap(router)
 
 	// Create and launch the HTTP server.
 	go func() {

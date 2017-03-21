@@ -1,12 +1,10 @@
-hash: b6132ca44a02e5b84ad8f27e24283918ff7c566256ebd76fac73564646aec258
-updated: 2017-03-13T12:37:17.157991208Z
+hash: 77eab7ed7829910ee3d4f0266da67abc35fc1c8635bf11e577842222cf0e4791
+updated: 2017-03-21T15:35:06.768490243Z
 imports:
 - name: github.com/afex/hystrix-go
   version: 39520ddd07a9d9a071d615f7476798659f5a3b89
   subpackages:
   - hystrix
-  - hystrix/metric_collector
-  - hystrix/rolling
 - name: github.com/apache/thrift
   version: e0ccbd6e62e14f32d7c5fe0f9cec6eff3259b863
   subpackages:
@@ -106,21 +104,41 @@ imports:
   version: 1f30fe9094a513ce4c700b9a54458bbb0c96996c
 - name: github.com/Shopify/sarama
   version: 0fb560e5f7fbcaee2f75e3c34174320709f69944
-- name: github.com/sony/gobreaker
-  version: 809bcd5a528f344e95c2368796c9225d128f9b3e
-- name: github.com/streadway/handy
-  version: f450267a206e480d863d2a92846a40f6e2896b2a
+- name: github.com/Sirupsen/logrus
+  version: 10f801ebc38b33738c9d17d50860f484a0988ff5
+- name: github.com/weaveworks/common
+  version: f94043b3da140c7a735b1f2f286d72d19014b200
   subpackages:
-  - breaker
+  - errors
+  - middleware
+  - user
 - name: golang.org/x/net
   version: 7394c112eae4dba7e96bfcfe738e6373d61772b4
   subpackages:
   - context
   - context/ctxhttp
+  - http2
+  - http2/hpack
+  - internal/timeseries
+  - lex/httplex
+  - trace
+- name: golang.org/x/sys
+  version: 99f16d856c9836c42d24e7ab64ea72916925fa97
+  subpackages:
+  - unix
 - name: google.golang.org/grpc
   version: 50955793b0183f9de69bd78e2ec251cf20aab121
   subpackages:
+  - codes
+  - credentials
+  - grpclog
+  - internal
   - metadata
+  - naming
+  - peer
+  - stats
+  - tap
+  - transport
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
