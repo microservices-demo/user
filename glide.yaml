@@ -27,3 +27,6 @@ import:
   subpackages:
   - hystrix
 - package: github.com/felixge/httpsnoop
+- package: github.com/weaveworks/common
+  subpackages:
+  - middleware
