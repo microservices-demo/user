@@ -1,5 +1,5 @@
 #!/bin/bash
-sleep 2
+sleep 10
 RESPONSECODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8084/customers)
 if [ $RESPONSECODE != 200 ]
 	then

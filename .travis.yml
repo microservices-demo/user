@@ -1,5 +1,5 @@
 language: go
-go: 1.7
+go: 1.7.5
 sudo: required
 env:
 - GROUP=weaveworksdemos COMMIT=$TRAVIS_COMMIT TAG=$TRAVIS_TAG
