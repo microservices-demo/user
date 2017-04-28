@@ -1,6 +1,7 @@
 package: github.com/microservices-demo/user
 import:
 - package: github.com/go-kit/kit
+  version: v0.4.0
   subpackages:
   - endpoint
   - log
@@ -16,9 +17,6 @@ import:
   subpackages:
   - prometheus
   - prometheus/promhttp
-- package: golang.org/x/net
-  subpackages:
-  - context
 - package: gopkg.in/mgo.v2
   subpackages:
   - bson
