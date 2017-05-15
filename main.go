@@ -19,7 +19,6 @@ import (
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	commonMiddleware "github.com/weaveworks/common/middleware"
-	"golang.org/x/net/context"
 )
 
 var (
@@ -51,14 +50,13 @@ func main() {
 	flag.Parse()
 	// Mechanical stuff.
 	errc := make(chan error)
-	ctx := context.Background()
 
 	// Log domain.
 	var logger log.Logger
 	{
 		logger = log.NewLogfmtLogger(os.Stderr)
-		logger = log.NewContext(logger).With("ts", log.DefaultTimestampUTC)
-		logger = log.NewContext(logger).With("caller", log.DefaultCaller)
+		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
 
 	var tracer stdopentracing.Tracer
@@ -66,7 +64,7 @@ func main() {
 		if zip == "" {
 			tracer = stdopentracing.NoopTracer{}
 		} else {
-			logger := log.NewContext(logger).With("tracer", "Zipkin")
+			logger := log.With(logger, "tracer", "Zipkin")
 			logger.Log("addr", zip)
 			collector, err := zipkin.NewHTTPCollector(
 				zip,
@@ -128,7 +126,7 @@ func main() {
 	endpoints := api.MakeEndpoints(service, tracer)
 
 	// HTTP router
-	router := api.MakeHTTPHandler(ctx, endpoints, logger, tracer)
+	router := api.MakeHTTPHandler(endpoints, logger, tracer)
 
 	httpMiddleware := []commonMiddleware.Interface{
 		commonMiddleware.Instrument{

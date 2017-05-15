@@ -1,5 +1,5 @@
-hash: 77eab7ed7829910ee3d4f0266da67abc35fc1c8635bf11e577842222cf0e4791
-updated: 2017-03-21T15:35:06.768490243Z
+hash: ab1322ca6d24e40907af3a701959880ad721afa2e1b67eaf0c945bb74c9a5c30
+updated: 2017-04-28T12:53:43.461401871+02:00
 imports:
 - name: github.com/afex/hystrix-go
   version: 39520ddd07a9d9a071d615f7476798659f5a3b89
@@ -28,7 +28,7 @@ imports:
 - name: github.com/felixge/httpsnoop
   version: 287b56e9e314227d3113c7c6b434d31aec68089d
 - name: github.com/go-kit/kit
-  version: 988c05d06d8ee3a9c13782f0e49b2c6e4726388d
+  version: fadad6fffe0466b19df9efd9acde5c9a52df5fa4
   subpackages:
   - circuitbreaker
   - endpoint
