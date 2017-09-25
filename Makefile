@@ -60,9 +60,12 @@ dockertravisbuild: build
 	cp -rf bin docker/user/
 	docker build -t $(NAME):$(TAG) -f docker/user/Dockerfile-release docker/user/
 	docker build -t $(DBNAME):$(TAG) -f docker/user-db/Dockerfile docker/user-db/
-	docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
-	scripts/push.sh
-
+	if [ -z "$(DOCKER_PASS)" ]; then \
+		echo "This is a build triggered by an external PR. Skipping docker push."; \
+	else \
+		docker login -u $(DOCKER_USER) -p $(DOCKER_PASS); \
+		scripts/push.sh; \
+	fi
 
 mockservice: 
 	docker run -d --name user-mock -h user-mock -v $(PWD)/apispec/mock.json:/data/db.json clue/json-server
