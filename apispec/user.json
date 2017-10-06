@@ -29,7 +29,6 @@
    "paths":{
       "/login":{
          "get":{
-            "security": ["basicAuth":[]],
             "description":"Return logged in user",
             "operationId":"Get Login",
             "produces":[
@@ -421,7 +420,7 @@
             }
          },
          "required":[
-            "_embedded",
+            "_embedded"
          ]
       },
       "Getcardsresponse":{
@@ -447,7 +446,7 @@
             }
          },
          "required":[
-            "_embedded",
+            "_embedded"
          ]
       },
       "Statusresponse":{
@@ -536,7 +535,7 @@
                },
                "required":[
                   "self",
-                  "customer",
+                  "customer"
                ]
             }
          },
