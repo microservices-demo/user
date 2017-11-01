@@ -3,9 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	corelog "log"
@@ -59,6 +61,16 @@ func main() {
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
 
+	// Find service local IP.
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		logger.Log("err", err)
+		os.Exit(1)
+	}
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	host := strings.Split(localAddr.String(), ":")[0]
+	defer conn.Close()
+
 	var tracer stdopentracing.Tracer
 	{
 		if zip == "" {
@@ -75,7 +87,7 @@ func main() {
 				os.Exit(1)
 			}
 			tracer, err = zipkin.NewTracer(
-				zipkin.NewRecorder(collector, false, fmt.Sprintf("localhost:%v", port), ServiceName),
+				zipkin.NewRecorder(collector, false, fmt.Sprintf("%v:%v", host, port), ServiceName),
 			)
 			if err != nil {
 				logger.Log("err", err)
