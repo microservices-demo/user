@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -31,7 +32,7 @@ type Database interface {
 var (
 	database string
 	//DefaultDb is the database set for the microservice
-	DefaultDb Database
+	DefaultDb TracingMiddleware
 	//DBTypes is a map of DB interfaces that can be used for this service
 	DBTypes = map[string]Database{}
 	//ErrNoDatabaseFound error returnes when database interface does not exists in DBTypes
@@ -60,7 +61,7 @@ func Init() error {
 //Set the DefaultDb
 func Set() error {
 	if v, ok := DBTypes[database]; ok {
-		DefaultDb = v
+		DefaultDb = DbTracingMiddleware()(v)
 		return nil
 	}
 	return fmt.Errorf(ErrNoDatabaseFound, database)
@@ -72,13 +73,13 @@ func Register(name string, db Database) {
 }
 
 //CreateUser invokes DefaultDb method
-func CreateUser(u *users.User) error {
-	return DefaultDb.CreateUser(u)
+func CreateUser(ctx context.Context, u *users.User) error {
+	return DefaultDb.CreateUser(ctx, u)
 }
 
 //GetUserByName invokes DefaultDb method
-func GetUserByName(n string) (users.User, error) {
-	u, err := DefaultDb.GetUserByName(n)
+func GetUserByName(ctx context.Context, n string) (users.User, error) {
+	u, err := DefaultDb.GetUserByName(ctx, n)
 	if err == nil {
 		u.AddLinks()
 	}
@@ -86,8 +87,8 @@ func GetUserByName(n string) (users.User, error) {
 }
 
 //GetUser invokes DefaultDb method
-func GetUser(n string) (users.User, error) {
-	u, err := DefaultDb.GetUser(n)
+func GetUser(ctx context.Context, n string) (users.User, error) {
+	u, err := DefaultDb.GetUser(ctx, n)
 	if err == nil {
 		u.AddLinks()
 	}
@@ -95,8 +96,8 @@ func GetUser(n string) (users.User, error) {
 }
 
 //GetUsers invokes DefaultDb method
-func GetUsers() ([]users.User, error) {
-	us, err := DefaultDb.GetUsers()
+func GetUsers(ctx context.Context) ([]users.User, error) {
+	us, err := DefaultDb.GetUsers(ctx)
 	for k, _ := range us {
 		us[k].AddLinks()
 	}
@@ -104,8 +105,8 @@ func GetUsers() ([]users.User, error) {
 }
 
 //GetUserAttributes invokes DefaultDb method
-func GetUserAttributes(u *users.User) error {
-	err := DefaultDb.GetUserAttributes(u)
+func GetUserAttributes(ctx context.Context, u *users.User) error {
+	err := DefaultDb.GetUserAttributes(ctx, u)
 	if err != nil {
 		return err
 	}
@@ -119,13 +120,13 @@ func GetUserAttributes(u *users.User) error {
 }
 
 //CreateAddress invokes DefaultDb method
-func CreateAddress(a *users.Address, userid string) error {
-	return DefaultDb.CreateAddress(a, userid)
+func CreateAddress(ctx context.Context, a *users.Address, userid string) error {
+	return DefaultDb.CreateAddress(ctx, a, userid)
 }
 
 //GetAddress invokes DefaultDb method
-func GetAddress(n string) (users.Address, error) {
-	a, err := DefaultDb.GetAddress(n)
+func GetAddress(ctx context.Context, n string) (users.Address, error) {
+	a, err := DefaultDb.GetAddress(ctx, n)
 	if err == nil {
 		a.AddLinks()
 	}
@@ -133,8 +134,8 @@ func GetAddress(n string) (users.Address, error) {
 }
 
 //GetAddresses invokes DefaultDb method
-func GetAddresses() ([]users.Address, error) {
-	as, err := DefaultDb.GetAddresses()
+func GetAddresses(ctx context.Context) ([]users.Address, error) {
+	as, err := DefaultDb.GetAddresses(ctx)
 	for k, _ := range as {
 		as[k].AddLinks()
 	}
@@ -142,18 +143,18 @@ func GetAddresses() ([]users.Address, error) {
 }
 
 //CreateCard invokes DefaultDb method
-func CreateCard(c *users.Card, userid string) error {
-	return DefaultDb.CreateCard(c, userid)
+func CreateCard(ctx context.Context, c *users.Card, userid string) error {
+	return DefaultDb.CreateCard(ctx, c, userid)
 }
 
 //GetCard invokes DefaultDb method
-func GetCard(n string) (users.Card, error) {
-	return DefaultDb.GetCard(n)
+func GetCard(ctx context.Context, n string) (users.Card, error) {
+	return DefaultDb.GetCard(ctx, n)
 }
 
 //GetCards invokes DefaultDb method
-func GetCards() ([]users.Card, error) {
-	cs, err := DefaultDb.GetCards()
+func GetCards(ctx context.Context) ([]users.Card, error) {
+	cs, err := DefaultDb.GetCards(ctx)
 	for k, _ := range cs {
 		cs[k].AddLinks()
 	}
@@ -161,8 +162,8 @@ func GetCards() ([]users.Card, error) {
 }
 
 //Delete invokes DefaultDb method
-func Delete(entity, id string) error {
-	return DefaultDb.Delete(entity, id)
+func Delete(ctx context.Context, entity, id string) error {
+	return DefaultDb.Delete(ctx, entity, id)
 }
 
 //Ping invokes DefaultDB method
