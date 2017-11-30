@@ -109,9 +109,16 @@ func (mw TracingMiddleware) GetUsers(ctx context.Context) ([]users.User, error) 
 	return us, err
 }
 
-func (mw TracingMiddleware) GetUserAttributes(ctx context.Context, u *users.User) error {
-	span := startSpan(ctx, "user attributes from db")
-	err := mw.next.GetUserAttributes(u)
+func (mw TracingMiddleware) GetUserAddresses(ctx context.Context, u *users.User) error {
+	span := startSpan(ctx, "user addresses from db")
+	err := mw.next.GetUserAddresses(u)
+	finishSpan(span, unsafe.Sizeof(u))
+	return err
+}
+
+func (mw TracingMiddleware) GetUserCards(ctx context.Context, u *users.User) error {
+	span := startSpan(ctx, "user cards from db")
+	err := mw.next.GetUserCards(u)
 	finishSpan(span, unsafe.Sizeof(u))
 	return err
 }

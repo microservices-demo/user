@@ -18,7 +18,8 @@ type Database interface {
 	GetUser(string) (users.User, error)
 	GetUsers() ([]users.User, error)
 	CreateUser(*users.User) error
-	GetUserAttributes(*users.User) error
+	GetUserAddresses(*users.User) error
+	GetUserCards(*users.User) error
 	GetAddress(string) (users.Address, error)
 	GetAddresses() ([]users.Address, error)
 	CreateAddress(*users.Address, string) error
@@ -106,7 +107,11 @@ func GetUsers(ctx context.Context) ([]users.User, error) {
 
 //GetUserAttributes invokes DefaultDb method
 func GetUserAttributes(ctx context.Context, u *users.User) error {
-	err := DefaultDb.GetUserAttributes(ctx, u)
+	err := DefaultDb.GetUserAddresses(ctx, u)
+	if err != nil {
+		return err
+	}
+	err = DefaultDb.GetUserCards(ctx, u)
 	if err != nil {
 		return err
 	}

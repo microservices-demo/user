@@ -238,8 +238,8 @@ func (m *Mongo) GetUsers() ([]users.User, error) {
 	return us, err
 }
 
-// GetUserAttributes given a user, load all cards and addresses connected to that user
-func (m *Mongo) GetUserAttributes(u *users.User) error {
+// GetUserAddresses given a user, load all addresses connected to that user
+func (m *Mongo) GetUserAddresses(u *users.User) error {
 	s := m.Session.Copy()
 	defer s.Close()
 	ids := make([]bson.ObjectId, 0)
@@ -261,8 +261,14 @@ func (m *Mongo) GetUserAttributes(u *users.User) error {
 		na = append(na, a.Address)
 	}
 	u.Addresses = na
+	return nil
+}
 
-	ids = make([]bson.ObjectId, 0)
+// GetUserCards given a user, load all cards connected to that user
+func (m *Mongo) GetUserCards(u *users.User) error {
+	s := m.Session.Copy()
+	defer s.Close()
+	ids := make([]bson.ObjectId, 0)
 	for _, c := range u.Cards {
 		if !bson.IsObjectIdHex(c.ID) {
 			return ErrInvalidHexID
@@ -270,12 +276,11 @@ func (m *Mongo) GetUserAttributes(u *users.User) error {
 		ids = append(ids, bson.ObjectIdHex(c.ID))
 	}
 	var mc []MongoCard
-	c = s.DB("").C("cards")
-	err = c.Find(bson.M{"_id": bson.M{"$in": ids}}).All(&mc)
+	c := s.DB("").C("cards")
+	err := c.Find(bson.M{"_id": bson.M{"$in": ids}}).All(&mc)
 	if err != nil {
 		return err
 	}
-
 	nc := make([]users.Card, 0)
 	for _, ca := range mc {
 		ca.Card.ID = ca.ID.Hex()
