@@ -2,8 +2,8 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"os"
-	"unsafe"
 
 	"github.com/microservices-demo/user/users"
 
@@ -34,56 +34,56 @@ func (mw TracingMiddleware) Init() error {
 func (mw TracingMiddleware) CreateAddress(ctx context.Context, a *users.Address, userid string) error {
 	span := startSpan(ctx, "create address on db")
 	err := mw.next.CreateAddress(a, userid)
-	finishSpan(span, 0)
+	finishSpan(span, len(fmt.Sprintf("%#v", a)))
 	return err
 }
 
 func (mw TracingMiddleware) CreateCard(ctx context.Context, c *users.Card, userid string) error {
 	span := startSpan(ctx, "create card on db")
 	err := mw.next.CreateCard(c, userid)
-	finishSpan(span, 0)
+	finishSpan(span, len(fmt.Sprintf("%#v", c)))
 	return err
 }
 
 func (mw TracingMiddleware) CreateUser(ctx context.Context, u *users.User) error {
-	span := startSpan(ctx, "create card on db")
+	span := startSpan(ctx, "create user on db")
 	err := mw.next.CreateUser(u)
-	finishSpan(span, 0)
+	finishSpan(span, len(fmt.Sprintf("%#v", u)))
 	return err
 }
 
 func (mw TracingMiddleware) Delete(ctx context.Context, entity, id string) error {
 	span := startSpan(ctx, "delete from db")
 	err := mw.next.Delete(entity, id)
-	finishSpan(span, 0)
+	finishSpan(span, len(fmt.Sprintf("%#v", entity)))
 	return err
 }
 
 func (mw TracingMiddleware) GetAddress(ctx context.Context, n string) (users.Address, error) {
 	span := startSpan(ctx, "address from db")
 	a, err := mw.next.GetAddress(n)
-	finishSpan(span, unsafe.Sizeof(a))
+	finishSpan(span, len(fmt.Sprintf("%#v", a)))
 	return a, err
 }
 
 func (mw TracingMiddleware) GetAddresses(ctx context.Context) ([]users.Address, error) {
 	span := startSpan(ctx, "addresses from db")
 	a, err := mw.next.GetAddresses()
-	finishSpan(span, unsafe.Sizeof(a))
+	finishSpan(span, len(fmt.Sprintf("%#v", a)))
 	return a, err
 }
 
 func (mw TracingMiddleware) GetCard(ctx context.Context, n string) (users.Card, error) {
 	span := startSpan(ctx, "card from db")
 	c, err := mw.next.GetCard(n)
-	finishSpan(span, unsafe.Sizeof(c))
+	finishSpan(span, len(fmt.Sprintf("%#v", c)))
 	return c, err
 }
 
 func (mw TracingMiddleware) GetCards(ctx context.Context) ([]users.Card, error) {
 	span := startSpan(ctx, "cards from db")
 	c, err := mw.next.GetCards()
-	finishSpan(span, unsafe.Sizeof(c))
+	finishSpan(span, len(fmt.Sprintf("%#v", c)))
 	return c, err
 }
 
@@ -91,35 +91,35 @@ func (mw TracingMiddleware) GetCards(ctx context.Context) ([]users.Card, error) 
 func (mw TracingMiddleware) GetUserByName(ctx context.Context, n string) (users.User, error) {
 	span := startSpan(ctx, "user from db")
 	u, err := mw.next.GetUserByName(n)
-	finishSpan(span, unsafe.Sizeof(u))
+	finishSpan(span, len(fmt.Sprintf("%#v", u)))
 	return u, err
 }
 
 func (mw TracingMiddleware) GetUser(ctx context.Context, n string) (users.User, error) {
 	span := startSpan(ctx, "user from db")
 	u, err := mw.next.GetUser(n)
-	finishSpan(span, unsafe.Sizeof(u))
+	finishSpan(span, len(fmt.Sprintf("%#v", u)))
 	return u, err
 }
 
 func (mw TracingMiddleware) GetUsers(ctx context.Context) ([]users.User, error) {
 	span := startSpan(ctx, "users from db")
 	us, err := mw.next.GetUsers()
-	finishSpan(span, unsafe.Sizeof(us))
+	finishSpan(span, len(fmt.Sprintf("%#v", us)))
 	return us, err
 }
 
 func (mw TracingMiddleware) GetUserAddresses(ctx context.Context, u *users.User) error {
 	span := startSpan(ctx, "user addresses from db")
 	err := mw.next.GetUserAddresses(u)
-	finishSpan(span, unsafe.Sizeof(u))
+	finishSpan(span, len(fmt.Sprintf("%#v", u.Addresses)))
 	return err
 }
 
 func (mw TracingMiddleware) GetUserCards(ctx context.Context, u *users.User) error {
 	span := startSpan(ctx, "user cards from db")
 	err := mw.next.GetUserCards(u)
-	finishSpan(span, unsafe.Sizeof(u))
+	finishSpan(span, len(fmt.Sprintf("%#v", u.Cards)))
 	return err
 }
 
@@ -136,7 +136,7 @@ func startSpan(ctx context.Context, n string) stdopentracing.Span {
 	return span
 }
 
-func finishSpan(span stdopentracing.Span, size uintptr) {
+func finishSpan(span stdopentracing.Span, size int) {
 	span.SetTag("db.query.result.size", size)
 	span.Finish()
 }
