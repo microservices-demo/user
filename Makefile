@@ -48,24 +48,8 @@ dockerruntest: dockertestdb dockerdev
 	docker run -d --name my$(TESTDB) -h my$(TESTDB) $(TESTDB)
 	docker run -d --name $(INSTANCE)-dev -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
 
-docker: build
-	cp -rf bin docker/user/
-	docker build -t $(NAME) -f docker/user/Dockerfile-release docker/user/
-
-dockerlocal: build
-	cp -rf bin docker/user/
-	docker build -t $(INSTANCE)-local -f docker/user/Dockerfile-release docker/user/
-
-dockertravisbuild: build
-	cp -rf bin docker/user/
-	docker build -t $(NAME):$(TAG) -f docker/user/Dockerfile-release docker/user/
-	docker build -t $(DBNAME):$(TAG) -f docker/user-db/Dockerfile docker/user-db/
-	if [ -z "$(DOCKER_PASS)" ]; then \
-		echo "This is a build triggered by an external PR. Skipping docker push."; \
-	else \
-		docker login -u $(DOCKER_USER) -p $(DOCKER_PASS); \
-		scripts/push.sh; \
-	fi
+docker: 
+	docker build -t $(NAME) -f docker/user/Dockerfile-release .
 
 mockservice: 
 	docker run -d --name user-mock -h user-mock -v $(PWD)/apispec/mock.json:/data/db.json clue/json-server
@@ -89,6 +73,6 @@ clean: cleandocker
 	rm -rf docker/user/bin
 	rm -rf vendor
 
-build: deps
+local: deps
 	mkdir -p bin
 	CGO_ENABLED=0 go build -a -installsuffix cgo -o bin/$(INSTANCE) main.go
