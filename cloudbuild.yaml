@@ -1,17 +1,9 @@
 steps:
-    - name: 'alpine'
-      entrypoint: 'mkdir'
-      args: ['-p', 'docker/user/bin']
-
-    - name: 'gcr.io/cloud-builders/go'
-      env: ["PROJECT_ROOT=github.com/microservices-demo/user"]
-      args: ['build', '-a', '-installsuffix', 'cgo', '-o', 'docker/user/bin/user', 'main.go']
+    - name: 'gcr.io/cloud-builders/docker'
+      args: ['build', '-t', 'gcr.io/sock-shop-releases/user:$TAG_NAME', '-f', 'docker/user/Dockerfile-release', '.'] 
 
     - name: 'gcr.io/cloud-builders/docker'
-      args: ['build', '-t', 'gcr.io/sock-shop-releases/user:$TAG_NAME', '-f', 'docker/user/Dockerfile-release', 'docker/user/'] 
-
-    - name: 'gcr.io/cloud-builders/docker'
-      args: ['tag', '-t', 'gcr.io/sock-shop-releases/user:$TAG_NAME', 'gcr.io/sock-shop-releases/user:latest'] 
+      args: ['tag', 'gcr.io/sock-shop-releases/user:$TAG_NAME', 'gcr.io/sock-shop-releases/user:latest'] 
 
 images:
   - 'gcr.io/sock-shop-releases/user:latest'
