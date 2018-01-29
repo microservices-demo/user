@@ -7,7 +7,7 @@ GROUP = weaveworksdemos
 
 TAG=$(TRAVIS_COMMIT)
 
-default: build
+default: docker
 
 
 pre: 
@@ -48,17 +48,14 @@ dockerruntest: dockertestdb dockerdev
 	docker run -d --name my$(TESTDB) -h my$(TESTDB) $(TESTDB)
 	docker run -d --name $(INSTANCE)-dev -p 8084:8084 --link my$(TESTDB) -e MONGO_HOST="my$(TESTDB):27017" $(INSTANCE)-dev
 
-docker: build
-	cp -rf bin docker/user/
-	docker build -t $(NAME) -f docker/user/Dockerfile-release docker/user/
+docker:
+	docker build -t $(NAME) -f docker/user/Dockerfile-release .
 
-dockerlocal: build
-	cp -rf bin docker/user/
-	docker build -t $(INSTANCE)-local -f docker/user/Dockerfile-release docker/user/
+dockerlocal:
+	docker build -t $(INSTANCE)-local -f docker/user/Dockerfile-release .
 
-dockertravisbuild: build
-	cp -rf bin docker/user/
-	docker build -t $(NAME):$(TAG) -f docker/user/Dockerfile-release docker/user/
+dockertravisbuild: 
+	docker build -t $(NAME):$(TAG) -f docker/user/Dockerfile-release .
 	docker build -t $(DBNAME):$(TAG) -f docker/user-db/Dockerfile docker/user-db/
 	if [ -z "$(DOCKER_PASS)" ]; then \
 		echo "This is a build triggered by an external PR. Skipping docker push."; \
@@ -88,7 +85,3 @@ clean: cleandocker
 	rm -rf bin
 	rm -rf docker/user/bin
 	rm -rf vendor
-
-build: deps
-	mkdir -p bin
-	CGO_ENABLED=0 go build -a -installsuffix cgo -o bin/$(INSTANCE) main.go
