@@ -1,0 +1,5 @@
+product,group_description,description,hours,start,end,USD,project_name,category
+Droplets,,ubuntu-s-4vcpu-8gb-fra1-01 (s-4vcpu-8gb),303,2020-07-19 09:21:15 +0000,2020-08-01 00:00:00 +0000,$18.04,DATA DIGITAL BOT,iaas
+Droplet Backups,,ubuntu-s-4vcpu-8gb-fra1-01 (Backup Services),2,2020-07-19 09:52:02 +0000,2020-07-19 09:52:02 +0000,$1.80,DATA DIGITAL BOT,iaas
+Kubernetes Clusters,k8s-1-18-3-do-0-sfo2-1595150713407,3 nodes - 4 GB / 2 vCPU / 80 GB SSD,906,2020-07-19 09:29:33 +0000,2020-08-01 00:00:00 +0000,$24.36,DATA DIGITAL BOT,iaas
+Kubernetes Clusters,k8s-1-18-3-do-0-sfo2-1595150713407,3 nodes - 4 GB / 2 vCPU / 80 GB SSD,906,2020-07-19 09:29:39 +0000,2020-08-01 00:00:00 +0000,$24.36,DATA DIGITAL BOT,iaas
