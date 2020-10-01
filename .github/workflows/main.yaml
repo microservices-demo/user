@@ -69,7 +69,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
-          dockerfile: docker/user/Dockerfile-release
+          dockerfile: go/src/github.com/microservices-demo/user/docker/user/Dockerfile-release
+          path: go/src/github.com/microservices-demo/user
           repository: ${{ env.GROUP }}/${{ env.REPO }}
           tag_with_ref: true
           tag_with_sha: true
@@ -80,8 +81,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
-          dockerfile: docker/user-db/Dockerfile
-          path: docker/user-db
+          dockerfile: go/src/github.com/microservices-demo/user/docker/user-db/Dockerfile
+          path: go/src/github.com/microservices-demo/user/docker/user-db
           repository: ${{ env.GROUP }}/${{ env.REPO }}
           tag_with_ref: true
           tag_with_sha: true
