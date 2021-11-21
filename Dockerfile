@@ -1,13 +1,16 @@
-FROM golang:1.7-alpine
-ENV sourcesdir /go/src/github.com/microservices-demo/user/
-ENV MONGO_HOST mytestdb:27017
-ENV HATEAOS user
-ENV USER_DATABASE mongodb
+FROM golang:1.17-buster AS build
+WORKDIR /app
 
-COPY . ${sourcesdir}
-RUN apk update
-RUN apk add git
-RUN go get -v github.com/Masterminds/glide && cd ${sourcesdir} && glide install && go install
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+COPY . ./
 
-ENTRYPOINT user
+RUN go build -o /user
+
+FROM gcr.io/distroless/base-debian10
+WORKDIR /
+COPY --from=build /user /user
 EXPOSE 8084
+USER nonroot:nonroot
+ENTRYPOINT ["/user"]

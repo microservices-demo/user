@@ -16,7 +16,7 @@ jobs:
   test:
     defaults:
       run:
-        working-directory: go/src/github.com/microservices-demo/user
+        working-directory: go/src/github.com/TUB-CNPE-TB/user
     runs-on: ubuntu-latest
     env:
       GROUP: weaveworksdemos
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
-          path: go/src/github.com/microservices-demo/user
+          path: go/src/github.com/TUB-CNPE-TB/user
 
       - uses: actions/setup-go@v1
         with:
@@ -69,8 +69,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
-          dockerfile: go/src/github.com/microservices-demo/user/docker/user/Dockerfile-release
-          path: go/src/github.com/microservices-demo/user
+          dockerfile: go/src/github.com/TUB-CNPE-TB/user/docker/user/Dockerfile-release
+          path: go/src/github.com/TUB-CNPE-TB/user
           repository: ${{ env.GROUP }}/${{ env.REPO }}
           tag_with_ref: true
           tag_with_sha: true
@@ -81,8 +81,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
-          dockerfile: go/src/github.com/microservices-demo/user/docker/user-db/Dockerfile
-          path: go/src/github.com/microservices-demo/user/docker/user-db
+          dockerfile: go/src/github.com/TUB-CNPE-TB/user/docker/user-db/Dockerfile
+          path: go/src/github.com/TUB-CNPE-TB/user/docker/user-db
           repository: ${{ env.GROUP }}/${{ env.REPO }}
           tag_with_ref: true
           tag_with_sha: true

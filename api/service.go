@@ -10,8 +10,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/microservices-demo/user/db"
-	"github.com/microservices-demo/user/users"
+	"github.com/TUB-CNPE-TB/user/db"
+	"github.com/TUB-CNPE-TB/user/users"
 )
 
 var (

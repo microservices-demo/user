@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/microservices-demo/user/users"
+	"github.com/TUB-CNPE-TB/user/users"
 	"gopkg.in/mgo.v2/bson"
 	"gopkg.in/mgo.v2/dbtest"
 )

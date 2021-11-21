@@ -1,4 +1,4 @@
-package: github.com/microservices-demo/user
+package: github.com/TUB-CNPE-TB/user
 import:
 - package: github.com/go-kit/kit
   version: v0.4.0

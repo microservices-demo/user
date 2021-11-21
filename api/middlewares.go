@@ -3,9 +3,9 @@ package api
 import (
 	"time"
 
+	"github.com/TUB-CNPE-TB/user/users"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics"
-	"github.com/microservices-demo/user/users"
 )
 
 // Middleware decorates a service.

@@ -3,7 +3,7 @@ package api
 import (
 	"testing"
 
-	"github.com/microservices-demo/user/users"
+	"github.com/TUB-CNPE-TB/user/users"
 )
 
 var (

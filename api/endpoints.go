@@ -7,10 +7,10 @@ package api
 import (
 	"context"
 
+	"github.com/TUB-CNPE-TB/user/db"
+	"github.com/TUB-CNPE-TB/user/users"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/tracing/opentracing"
-	"github.com/microservices-demo/user/db"
-	"github.com/microservices-demo/user/users"
 	stdopentracing "github.com/opentracing/opentracing-go"
 )
 

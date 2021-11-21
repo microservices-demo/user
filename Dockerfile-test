@@ -1,6 +1,6 @@
 FROM mongo:3
 
-ENV sourcesdir /go/src/github.com/microservices-demo/user/
+ENV sourcesdir /go/src/github.com/TUB-CNPE-TB/user/
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 

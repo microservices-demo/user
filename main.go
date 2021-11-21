@@ -7,18 +7,16 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	corelog "log"
 
+	"github.com/TUB-CNPE-TB/user/api"
+	"github.com/TUB-CNPE-TB/user/db"
+	"github.com/TUB-CNPE-TB/user/db/mongodb"
 	"github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	"github.com/microservices-demo/user/api"
-	"github.com/microservices-demo/user/db"
-	"github.com/microservices-demo/user/db/mongodb"
 	stdopentracing "github.com/opentracing/opentracing-go"
-	zipkin "github.com/openzipkin/zipkin-go-opentracing"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	commonMiddleware "github.com/weaveworks/common/middleware"
 )
@@ -67,33 +65,34 @@ func main() {
 		logger.Log("err", err)
 		os.Exit(1)
 	}
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	host := strings.Split(localAddr.String(), ":")[0]
+	//localAddr := conn.LocalAddr().(*net.UDPAddr)
+	//host := strings.Split(localAddr.String(), ":")[0]
 	defer conn.Close()
 
 	var tracer stdopentracing.Tracer
 	{
 		if zip == "" {
 			tracer = stdopentracing.NoopTracer{}
-		} else {
-			logger := log.With(logger, "tracer", "Zipkin")
-			logger.Log("addr", zip)
-			collector, err := zipkin.NewHTTPCollector(
-				zip,
-				zipkin.HTTPLogger(logger),
-			)
-			if err != nil {
-				logger.Log("err", err)
-				os.Exit(1)
-			}
-			tracer, err = zipkin.NewTracer(
-				zipkin.NewRecorder(collector, false, fmt.Sprintf("%v:%v", host, port), ServiceName),
-			)
-			if err != nil {
-				logger.Log("err", err)
-				os.Exit(1)
-			}
 		}
+		//else {
+		//logger := log.With(logger, "tracer", "Zipkin")
+		//logger.Log("addr", zip)
+		//collector, err := zipkin.NewHTTPCollector(
+		//	zip,
+		//	zipkin.HTTPLogger(logger),
+		//)
+		//if err != nil {
+		//	logger.Log("err", err)
+		//	os.Exit(1)
+		//}
+		//tracer, err = zipkin.NewTracer(
+		//	zipkin.NewRecorder(collector, false, fmt.Sprintf("%v:%v", host, port), ServiceName),
+		//)
+		//if err != nil {
+		//	logger.Log("err", err)
+		//	os.Exit(1)
+		//}
+		//}
 		stdopentracing.InitGlobalTracer(tracer)
 	}
 	dbconn := false
