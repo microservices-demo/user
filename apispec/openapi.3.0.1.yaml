@@ -1,0 +1,512 @@
+openapi: 3.0.1
+info:
+  title: User
+  description: Provide Customer login, register, retrieval, as well as card and address
+    retrieval
+  license:
+    name: MIT
+    url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
+  version: ""
+servers:
+  - url: http://user/
+  - url: http://localhost:8084/
+paths:
+  /login:
+    get:
+      description: Return logged in user
+      operationId: Get Login
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Getcustomersresponse'
+  /register:
+    post:
+      description: Register new user
+      operationId: Set User
+      requestBody:
+        description: register object
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Statusresponse'
+      x-codegen-request-body-name: register
+  /customers:
+    get:
+      description: Returns all customers
+      operationId: Get customers
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Getcustomersresponse'
+  /customers/{id}:
+    get:
+      description: Returns a customer
+      operationId: Get customer
+      parameters:
+        - name: id
+          in: path
+          description: ID of customer to fetch
+          required: true
+          schema:
+            type: string
+            default: 57a98d98e4b00679b4a830af
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Customer'
+    delete:
+      description: Delete customer
+      operationId: Delete customer
+      parameters:
+        - name: id
+          in: path
+          description: ID of customer to delete
+          required: true
+          schema:
+            type: string
+            default: 57a98d98e4b00679b4a830b5
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Deleteresponse'
+  /customers/{id}/cards:
+    get:
+      description: Returns a customer
+      operationId: Get customer cards
+      parameters:
+        - name: id
+          in: path
+          description: ID of customer to fetch
+          required: true
+          schema:
+            type: string
+            default: 57a98d98e4b00679b4a830af
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Getcardsresponse'
+  /customers/{id}/addresses:
+    get:
+      description: Returns an address
+      operationId: Get customer addresses
+      parameters:
+        - name: id
+          in: path
+          description: ID of customer to fetch
+          required: true
+          schema:
+            type: string
+            default: 57a98d98e4b00679b4a830af
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Listaddressresponse'
+  /cards:
+    get:
+      description: Return all cards
+      operationId: Get cards
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Getcardsresponse'
+    post:
+      description: Create new card
+      operationId: Set Card
+      requestBody:
+        description: Credit card
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/Postcard'
+        required: true
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Statusresponse'
+      x-codegen-request-body-name: card
+  /cards/{id}:
+    get:
+      description: Returns a card
+      operationId: Get card
+      parameters:
+        - name: id
+          in: path
+          description: ID of card to fetch
+          required: true
+          schema:
+            type: string
+            default: 57a98d98e4b00679b4a830ae
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Card'
+    delete:
+      description: Delete card
+      operationId: Delete card
+      parameters:
+        - name: id
+          in: path
+          description: ID of card to delete
+          required: true
+          schema:
+            type: string
+            default: 57a98d98e4b00679b4a830ae
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Deleteresponse'
+  /addresses:
+    get:
+      description: Returns all addresses
+      operationId: Get addresses
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Listaddressresponse'
+    post:
+      description: Create new address
+      operationId: Set Address
+      requestBody:
+        description: Address
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/Postaddress'
+        required: true
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Statusresponse'
+      x-codegen-request-body-name: address
+  /addresses/{id}:
+    get:
+      description: Returns an address
+      operationId: Get address
+      parameters:
+        - name: id
+          in: path
+          description: ID of address to fetch
+          required: true
+          schema:
+            type: string
+            default: 57a98d98e4b00679b4a830ad
+      responses:
+        200:
+          description: ""
+          content:
+            application:
+              schema:
+                $ref: '#/components/schemas/Address'
+    delete:
+      description: Delete address
+      operationId: Delete address
+      parameters:
+        - name: id
+          in: path
+          description: ID of address to delete
+          required: true
+          schema:
+            type: string
+            default: 57a98d98e4b00679b4a830ad
+      responses:
+        200:
+          description: ""
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Deleteresponse'
+components:
+  schemas:
+    Getcustomersresponse:
+      title: Get customers response
+      required:
+        - _embedded
+      type: object
+      properties:
+        _embedded:
+          type: object
+          properties:
+            customer:
+              type: array
+              items:
+                $ref: '#/components/schemas/Customer'
+        _links:
+          type: object
+          properties: {}
+        page:
+          type: object
+          properties: {}
+    Getcardsresponse:
+      title: Get cards response
+      required:
+        - _embedded
+      type: object
+      properties:
+        _embedded:
+          type: object
+          properties:
+            card:
+              type: array
+              items:
+                $ref: '#/components/schemas/Card'
+        _links:
+          type: object
+          properties: {}
+        page:
+          type: object
+          properties: {}
+    Statusresponse:
+      title: Post status response
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+    Deleteresponse:
+      title: Delete status response
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: boolean
+    Customer:
+      required:
+        - _links
+        - firstName
+        - lastName
+        - username
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        _links:
+          required:
+            - customer
+            - self
+          type: object
+          properties:
+            self:
+              required:
+                - href
+              type: object
+              properties:
+                href:
+                  type: string
+            customer:
+              required:
+                - href
+              type: object
+              properties:
+                href:
+                  type: string
+            addresses:
+              required:
+                - href
+              type: object
+              properties:
+                href:
+                  type: string
+            cards:
+              required:
+                - href
+              type: object
+              properties:
+                href:
+                  type: string
+    Card:
+      required:
+        - _links
+        - ccv
+        - expires
+        - longNum
+      type: object
+      properties:
+        longNum:
+          type: string
+        expires:
+          type: string
+        ccv:
+          type: string
+        _links:
+          required:
+            - card
+            - self
+          type: object
+          properties:
+            self:
+              required:
+                - href
+              type: object
+              properties:
+                href:
+                  type: string
+            card:
+              required:
+                - href
+              type: object
+              properties:
+                href:
+                  type: string
+    Address:
+      required:
+        - _links
+        - city
+        - country
+        - number
+        - postcode
+        - street
+      type: object
+      properties:
+        number:
+          type: string
+        street:
+          type: string
+        city:
+          type: string
+        postcode:
+          type: string
+        country:
+          type: string
+        _links:
+          required:
+            - address
+            - self
+          type: object
+          properties:
+            self:
+              required:
+                - href
+              type: object
+              properties:
+                href:
+                  type: string
+            address:
+              required:
+                - href
+              type: object
+              properties:
+                href:
+                  type: string
+    Listaddressresponse:
+      title: List response
+      required:
+        - _embedded
+      type: object
+      properties:
+        _embedded:
+          type: object
+          properties:
+            address:
+              type: array
+              items:
+                $ref: '#/components/schemas/Address'
+        _links:
+          type: object
+          properties: {}
+        page:
+          type: object
+          properties: {}
+    Register:
+      title: Register
+      required:
+        - password
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username
+        password:
+          type: string
+          description: Password
+        email:
+          type: string
+          description: Email
+    Postcard:
+      title: Post Card
+      type: object
+      properties:
+        longNum:
+          type: string
+          description: Credit card number
+        expires:
+          type: string
+          description: Card expiration
+        ccv:
+          type: string
+          description: Card ccv
+        userID:
+          type: string
+          description: User to attach this card to.
+    Postaddress:
+      title: Post Address
+      type: object
+      properties:
+        street:
+          type: string
+        number:
+          type: string
+        country:
+          type: string
+        city:
+          type: string
+        postcode:
+          type: string
+        userID:
+          type: string
+          description: User to attach this card to.
+  securitySchemes:
+    basicAuth:
+      type: http
+      description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+      scheme: basic

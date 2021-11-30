@@ -19,10 +19,10 @@ jobs:
         working-directory: go/src/github.com/TUB-CNPE-TB/user
     runs-on: ubuntu-latest
     env:
-      GROUP: weaveworksdemos
+      GROUP: europe-west3-docker.pkg.dev/cnpe-blue/sockshop
       COMMIT: ${{ github.sha }}
       REPO: user
-      GO_VERSION: 1.7.5
+      GO_VERSION: 1.17
       GOPATH: /home/runner/work/user/user/go
 
     steps:
@@ -38,51 +38,32 @@ jobs:
       - name: Setup PATH
         run: echo "${GOPATH}/bin" >> $GITHUB_PATH
 
-      - name: Install dependencies
-        run: make deps && go get -v github.com/mattn/goveralls
-
-      - name: Install/Downgrade MongoDB to version 3.6
-        run: |
-          wget -qO - https://www.mongodb.org/static/pgp/server-3.6.asc | sudo apt-key add -
-          echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/3.6 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
-          sudo apt-get update
-          sudo apt-get install -y --allow-downgrades mongodb-org=3.6.20 mongodb-org-server=3.6.20 mongodb-org-shell=3.6.20 mongodb-org-mongos=3.6.20 mongodb-org-tools=3.6.20 || echo "Error is misleading, it was successfully installed"
-
-      - name: Unit Tests
-        run: glide novendor| xargs go test -v
-
-      - name: Create cover profile
-        run: make coverprofile
-
-      - name: Run Docker Test
-        run: make dockertest
-
-      - name: Submit Coveralls
-        env:
-          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=cover.profile -service=github
-
-      # Push to dockerhub
-      - name: Push user to Docker Hub
-        uses: docker/build-push-action@v1
-        if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
+      #
+      #
+      # Build docker image for service
+      - name: Build docker image
+        uses: docker/build-push-action@v2
         with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
-          dockerfile: go/src/github.com/TUB-CNPE-TB/user/docker/user/Dockerfile-release
-          path: go/src/github.com/TUB-CNPE-TB/user
+          push: false
           repository: ${{ env.GROUP }}/${{ env.REPO }}
           tag_with_ref: true
           tag_with_sha: true
+          tags: ${{ github.sha }}
 
-      - name: Push user-db to Docker Hub
-        uses: docker/build-push-action@v1
+      #
+      #
+      # Login to GAR
+      - name: Login to GAR
+        uses: docker/login-action@v1
         if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
         with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
-          dockerfile: go/src/github.com/TUB-CNPE-TB/user/docker/user-db/Dockerfile
-          path: go/src/github.com/TUB-CNPE-TB/user/docker/user-db
-          repository: ${{ env.GROUP }}/${{ env.REPO }}
-          tag_with_ref: true
-          tag_with_sha: true
+          registry: europe-west3-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GAR_JSON_KEY }}
+
+      #
+      #
+      # Push to GAR
+      - name: Push to GAR
+        if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
+        run: docker push ${{ env.GROUP }}/${{ env.REPO }} --all-tags

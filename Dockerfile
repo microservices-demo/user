@@ -11,6 +11,6 @@ RUN go build -o /user
 FROM gcr.io/distroless/base-debian10
 WORKDIR /
 COPY --from=build /user /user
-EXPOSE 8084
+EXPOSE 8080
 USER nonroot:nonroot
-ENTRYPOINT ["/user"]
+ENTRYPOINT ["/user", "-port=8080"]

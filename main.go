@@ -9,16 +9,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	corelog "log"
-
 	"github.com/TUB-CNPE-TB/user/api"
 	"github.com/TUB-CNPE-TB/user/db"
 	"github.com/TUB-CNPE-TB/user/db/mongodb"
 	"github.com/go-kit/kit/log"
-	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	commonMiddleware "github.com/weaveworks/common/middleware"
 )
 
 var (
@@ -54,7 +50,7 @@ func main() {
 	// Log domain.
 	var logger log.Logger
 	{
-		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
 		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
@@ -62,8 +58,10 @@ func main() {
 	// Find service local IP.
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		logger.Log("err", err)
+		_ = logger.Log("msg", "Unable to find service local IP", "error", err)
 		os.Exit(1)
+	} else {
+		_ = logger.Log("local_ip", conn.LocalAddr())
 	}
 	//localAddr := conn.LocalAddr().(*net.UDPAddr)
 	//host := strings.Split(localAddr.String(), ":")[0]
@@ -72,65 +70,31 @@ func main() {
 	var tracer stdopentracing.Tracer
 	{
 		if zip == "" {
+			_ = logger.Log("zipkin_status", "No tracer")
 			tracer = stdopentracing.NoopTracer{}
 		}
-		//else {
-		//logger := log.With(logger, "tracer", "Zipkin")
-		//logger.Log("addr", zip)
-		//collector, err := zipkin.NewHTTPCollector(
-		//	zip,
-		//	zipkin.HTTPLogger(logger),
-		//)
-		//if err != nil {
-		//	logger.Log("err", err)
-		//	os.Exit(1)
-		//}
-		//tracer, err = zipkin.NewTracer(
-		//	zipkin.NewRecorder(collector, false, fmt.Sprintf("%v:%v", host, port), ServiceName),
-		//)
-		//if err != nil {
-		//	logger.Log("err", err)
-		//	os.Exit(1)
-		//}
-		//}
 		stdopentracing.InitGlobalTracer(tracer)
 	}
+
 	dbconn := false
 	for !dbconn {
 		err := db.Init()
 		if err != nil {
 			if err == db.ErrNoDatabaseSelected {
-				corelog.Fatal(err)
+				_ = logger.Log("db_conn", "No database selected", "error", err)
+				os.Exit(1)
 			}
-			corelog.Print(err)
+			_ = logger.Log("db_conn", "Database init failed", "error", err)
 		} else {
 			dbconn = true
 		}
 	}
 
-	fieldKeys := []string{"method"}
 	// Service domain.
 	var service api.Service
 	{
 		service = api.NewFixedService()
 		service = api.LoggingMiddleware(logger)(service)
-		service = api.NewInstrumentingService(
-			kitprometheus.NewCounterFrom(
-				stdprometheus.CounterOpts{
-					Namespace: "microservices_demo",
-					Subsystem: "user",
-					Name:      "request_count",
-					Help:      "Number of requests received.",
-				},
-				fieldKeys),
-			kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
-				Namespace: "microservices_demo",
-				Subsystem: "user",
-				Name:      "request_latency_microseconds",
-				Help:      "Total duration of requests in microseconds.",
-			}, fieldKeys),
-			service,
-		)
 	}
 
 	// Endpoint domain.
@@ -139,20 +103,10 @@ func main() {
 	// HTTP router
 	router := api.MakeHTTPHandler(endpoints, logger, tracer)
 
-	httpMiddleware := []commonMiddleware.Interface{
-		commonMiddleware.Instrument{
-			Duration:     HTTPLatency,
-			RouteMatcher: router,
-		},
-	}
-
-	// Handler
-	handler := commonMiddleware.Merge(httpMiddleware...).Wrap(router)
-
 	// Create and launch the HTTP server.
 	go func() {
-		logger.Log("transport", "HTTP", "port", port)
-		errc <- http.ListenAndServe(fmt.Sprintf(":%v", port), handler)
+		_ = logger.Log("transport", "HTTP", "port", port)
+		errc <- http.ListenAndServe(fmt.Sprintf(":%v", port), router)
 	}()
 
 	// Capture interrupts.
@@ -162,5 +116,5 @@ func main() {
 		errc <- fmt.Errorf("%s", <-c)
 	}()
 
-	logger.Log("exit", <-errc)
+	_ = logger.Log("exit", <-errc)
 }
