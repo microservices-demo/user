@@ -1,9 +1,9 @@
-From alpinelinux/golang
+From golang:1.19-alpine
 
 WORKDIR /app
 COPY . /app
 RUN whoami
-RUN chown -R build ../app 
+
 RUN go mod init github.com/thedevopsschool/user-service
 RUN go mod tidy
 RUN go build .
