@@ -2,8 +2,8 @@ From alpinelinux/golang
 
 WORKDIR /app
 COPY . /app
-RUN ls -l | grep go.mod
-RUN sudo go mod tidy
+RUN chmod 777 go.mod
+RUN go mod tidy
 RUN go build .
 CMD ["/app/user-service"]
 
