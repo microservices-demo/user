@@ -21,8 +21,8 @@ jobs:
       run: go mod tidy 
     - name: go build
       run: go build -o user-service 
-    - name: remove go mod init
-      run: rm go.mod
+   # - name: remove go mod init
+   #  run: rm go.mod
       
     - name: Build and Push Docker Image
       uses: mr-smithers-excellent/docker-build-push@v4
