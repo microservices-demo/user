@@ -1,13 +1,11 @@
-FROM golang:1.7-alpine
-ENV sourcesdir /go/src/github.com/microservices-demo/user/
-ENV MONGO_HOST mytestdb:27017
-ENV HATEAOS user
-ENV USER_DATABASE mongodb
+From golang:1.19-alpine
 
-COPY . ${sourcesdir}
-RUN apk update
-RUN apk add git
-RUN go get -v github.com/Masterminds/glide && cd ${sourcesdir} && glide install && go install
+WORKDIR /app
+COPY . /app
+RUN whoami
 
-ENTRYPOINT user
-EXPOSE 8084
+RUN go mod init github.com/thedevopsschool/user-service
+RUN go mod tidy
+RUN go build .
+CMD ["/app/user-service"]
+
